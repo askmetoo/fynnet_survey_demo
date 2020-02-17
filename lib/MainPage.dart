@@ -10,46 +10,92 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+
+  List<Map> surveys = [
+    {
+      'id' : '1',
+      'title' : 'First survey',
+      'author' : 'Albert A.',
+      'views' : 234,
+      'responses' : 10,
+    },
+    {
+      'id' : '2',
+      'title' : 'Second survey',
+      'author' : 'Brittany B.',
+      'views' : 74,
+      'responses' : 23,
+    },
+    {
+      'id' : '3',
+      'title' : 'This survey\'s name is too long to fit into one line, so it should be truncated',
+      'author' : 'Anonymous',
+      'views' : 9,
+      'responses' : 2,
+    }
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.person),
+            tooltip: "Log in",
+            onPressed: () {},
+          )
+        ]
       ),
 
       body: Center(
-        child: _buildSurveyList()
-        ),
+        child: Column(
+          children: [
+            Card(child: Text('Insert search box here')), // TODO: add search functionality
+
+            // Show the 5 (?) most viewed/answered surveys which the user (if logged in) has not yet answered or dismissed
+            Text('Our most popular surveys',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              )
+            ),
+            _buildSurveyList(surveys),
+
+          ]
+        )
+      ),
     );
   }
 }
 
-Widget _buildSurveyList() => ListView(
-  children: <ListTile>[
-                  _survey('Number one', 'first one', 234),
-                  _survey('Number two', 'second', 76, true),
-                  _survey('Third', '', 3),
-                  _survey('testing', '', 2)
-                ],
+Widget _buildSurveyList(List surveys) => Expanded(
+  child: ListView.builder(
+    itemCount: surveys.length,
+    itemBuilder: (BuildContext context, int index) => _surveyListing(surveys[index]),
+  )
 );
 
-ListTile _survey(String title, String description, int views, [bool answered = false]) {
+// Creates a ListTile of provided survey object to be fed into a ListView
+ListTile _surveyListing(Map survey, [bool answered = false]) {
+  final String title = survey['title'];
   return ListTile(
-    title: Text(title,
+    title: Text(survey['title'],
       style: TextStyle(
         fontWeight: FontWeight.w700,
         color: answered ? Colors.grey : Colors.black,
         decoration: answered ? TextDecoration.lineThrough : TextDecoration.none,
       )
     ),
-    subtitle: Text(description,
+    subtitle: Text('Created by: ${survey['author']}',
       style: TextStyle(
         color: answered ? Colors.grey[400] : Colors.grey[600],
         decoration: answered ? TextDecoration.lineThrough : TextDecoration.none,
       )
     ),
     leading: Icon(
-      answered ? Icons.check_box : Icons.check_box_outline_blank, 
+      Icons.comment, 
       color: Colors.green[700]
     ),
     trailing: Icon(Icons.keyboard_arrow_right),
