@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'Login.dart';
+
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
 
@@ -44,7 +46,21 @@ class _MainPageState extends State<MainPage> {
           IconButton(
             icon: Icon(Icons.person),
             tooltip: "Log in",
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => new SimpleDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  contentPadding: EdgeInsets.all(24),
+                  children: [
+                    Login.loginText,
+                    Login.usernameField,
+                    Login.passwordField,
+                    Login.loginButton
+                  ],
+                )
+              );
+            },
           )
         ]
       ),
@@ -57,7 +73,7 @@ class _MainPageState extends State<MainPage> {
             // Show the 5 (?) most viewed/answered surveys which the user (if logged in) has not yet answered or dismissed
             Text('Our most popular surveys',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
               )
             ),
