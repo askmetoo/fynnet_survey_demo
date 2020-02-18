@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-
-import 'schemas.dart';
 
 class PersonalPage extends StatefulWidget {
   PersonalPage({Key key, this.title}) : super(key: key);
@@ -25,7 +22,7 @@ class _PersonalPageState extends State<PersonalPage> {
           ),
         ),
         body: TabBarView(
-          children: _tabs.map((PersonalTab tab) => tab.content).toList()
+          children: _tabs.map( (PersonalTab tab) => tab.content ).toList()
         ),
       ),
     );
