@@ -39,29 +39,25 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    MaterialButton _accountButton = FlatButton(
+      textColor: Colors.white,
+      child: Row(
+        children: [
+          Icon(Icons.person),
+          Text('Your Account')
+        ]
+      ),
+      onPressed: () => showDialog(
+        context: context, 
+        builder: (BuildContext context) => new LoginDialog()
+      )
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.person),
-            tooltip: "Log in",
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => new SimpleDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  contentPadding: EdgeInsets.all(24),
-                  children: [
-                    Login.loginText,
-                    Login.usernameField,
-                    Login.passwordField,
-                    Login.loginButton
-                  ],
-                )
-              );
-            },
-          )
+          _accountButton
         ]
       ),
 

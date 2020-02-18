@@ -5,11 +5,7 @@ import 'package:uuid/uuid.dart';
 var uuid = Uuid();
 
 /*
-    Survey:
-    - id
-    - title
-    - author
-    - published
+  Survey
 */
 class Survey {
   String id;
@@ -17,6 +13,7 @@ class Survey {
   String title;
   bool published;
   List<SurveyQuestion> questions;
+  
 
   Survey() {
     this.id = uuid.v4();
@@ -26,10 +23,7 @@ class Survey {
 }
 
 /*
-  SurveyQuestion:
-  - id
-  - type
-  - question
+  SurveyQuestion
 */
 class SurveyQuestion {
   String id;
@@ -48,21 +42,17 @@ enum SurveyQuestionType {
 class RadioSurveyQuestion extends SurveyQuestion {
   RadioSurveyQuestion() : super(SurveyQuestionType.radio);
   List<_Choice> choices;
-  _Choice selected;
 }
 class CheckboxSurveyQuestion extends SurveyQuestion {
   CheckboxSurveyQuestion() : super(SurveyQuestionType.checkbox);
   List<_Choice> choices;
-  List<_Choice> selected;
 }
 class DropdownSurveyQuestion extends SurveyQuestion {
   DropdownSurveyQuestion() : super(SurveyQuestionType.dropdown);
   List<_Choice> choices;
-  _Choice selected;
 }
 class FreeformSurveyQuestion extends SurveyQuestion {
   FreeformSurveyQuestion() : super(SurveyQuestionType.freeform);
-  String response;
 }
 
 class _Choice {
