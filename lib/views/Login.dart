@@ -69,8 +69,10 @@ class _LoginDialogState extends State<LoginDialog>{
             padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.0)),
             onPressed: () {
-              // TODO
+              // TODO: implement communication with backend
               print('${_usernameController.text} | ${_passwordController.text}');
+              Navigator.pop(context, true); // close dialog box
+              Navigator.pushNamed(context, '/account');
             }
           )
         ),
@@ -83,10 +85,10 @@ class _LoginDialogState extends State<LoginDialog>{
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.0)),
             onPressed: () {
               setState(() {
-                // TODO: clear form
+                _usernameController.text = '';
+                _passwordController.text = '';
                 _signupAction = !_signupAction;
               });
-              
             }
           )
         )
