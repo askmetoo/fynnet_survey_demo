@@ -13,32 +13,48 @@ class _PersonalPageState extends State<PersonalPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: _tabs.length,
+
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
           bottom: TabBar(
-            tabs: [
-              Tab(
-                text: 'My Surveys',
-                icon: Icon(Icons.clear),
-              ),
-              Tab(
-                text: 'Answered Surveys',
-                icon: Icon(Icons.check_box),
-              ),
-              //Tab()
-            ]
+            tabs: _tabs.map( (PersonalTab tab) => Tab(text: tab.title, icon: Icon(tab.icon)) ).toList()
           ),
         ),
         body: TabBarView(
-          children: [
-            Card(child:Text('Tab1')),
-            Card(child:Text('Tab2')),
-            //Card(),
-          ]
+          children: _tabs.map((PersonalTab tab) => tab.content).toList()
         ),
       ),
     );
   }
 }
+
+class PersonalTab {
+  final String title;
+  final IconData icon;
+  final Widget content;
+  PersonalTab({this.title, this.icon, this.content});
+}
+
+// Define the tabs that are shown in the PersonalPage
+List<PersonalTab> _tabs = [
+  PersonalTab(
+    title: 'My Surveys',
+    icon: Icons.comment,
+    content: personalSurveyTab,
+  ),
+  PersonalTab(
+    title: 'Answered Surveys',
+    icon: Icons.check_box,
+    content: personalAnsweredTab,
+  )
+];
+
+// Define the content in each tab
+Widget personalSurveyTab = Card(
+  child: Text('Tab1')
+);
+Widget personalAnsweredTab = Card(
+  child: Text('Tab2')
+);
