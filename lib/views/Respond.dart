@@ -42,7 +42,7 @@ class _SurveyRespondState extends State<SurveyRespond> {
       body: Column(
         children: [
           Card(
-            child: QuestionPage(_currentQuestion)
+            child: QuestionPage(_currentQuestion, key: ObjectKey(_currentQuestion)) // Key to differentiate between different QuestionPages
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,22 +59,54 @@ class _SurveyRespondState extends State<SurveyRespond> {
   }
 }
 
-class QuestionPage extends StatelessWidget {
-  QuestionPage(this.question);
+class QuestionPage extends StatefulWidget {
+  QuestionPage(this.question, {Key key}) : super(key: key);
   final SurveyQuestion question;
+
+  @override
+  State<StatefulWidget> createState() => _QuestionPageState(question);
+
+}
+
+class _QuestionPageState extends State<QuestionPage> {
+  _QuestionPageState(this.question);
+  final SurveyQuestion question;
+  String _selection;
+
+  Widget _radioSelectionBuilder(List<String> choices) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: choices.map((String choice) => 
+        Padding(
+          padding: EdgeInsets.all(0.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Radio(
+                value: choice,
+                groupValue: _selection,
+                onChanged: (String value) {
+                  setState(() {
+                    _selection = value;
+                  });
+                },
+              ),
+              Text(choice)
+            ]
+          )
+        )
+      ).toList()
+    );
+  }
 
   @override 
   Widget build(BuildContext context) {
-    String questionText = this.question.text;
-
     return Padding(
       padding: EdgeInsets.all(12.0),
       child: Column(
         children: [
-          Text(questionText),
-          Column(
-            children: this.question.choices.map((String choice) => Text(choice)).toList()
-          )
+          Text(this.question.text),
+          _radioSelectionBuilder(this.question.choices)
         ]
       )
     );
