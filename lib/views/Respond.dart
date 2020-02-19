@@ -48,7 +48,10 @@ class _SurveyRespondState extends State<SurveyRespond> {
       }
     );
 
-    // FIXME: pressing back button while dialog is open will crash the app
+    MaterialButton _submitButton = _formControlButton('Submit',
+    onPressed: () {}
+    );
+
     Future<bool> _exitConfirmation() async {
       return await showDialog(
         context: context,
@@ -64,8 +67,9 @@ class _SurveyRespondState extends State<SurveyRespond> {
               },
             ),
             FlatButton(
+              color: Theme.of(context).errorColor,
               child: Text('Discard changes',
-                style: TextStyle(color: Theme.of(context).errorColor)
+                style: TextStyle(color: Theme.of(context).dialogBackgroundColor)
               ),
               onPressed: () {
                 Navigator.of(context).pop(true);
@@ -73,7 +77,7 @@ class _SurveyRespondState extends State<SurveyRespond> {
             )
           ]
         )
-      ) ?? false;
+      ) ?? false; // to deal with back button forcing dialog to return null
     }
     
     return WillPopScope(
