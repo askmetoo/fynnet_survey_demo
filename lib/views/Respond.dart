@@ -26,45 +26,82 @@ class _SurveyRespondState extends State<SurveyRespond> {
   Widget build(BuildContext context) {
     SurveyQuestion _currentQuestion = widget.survey.questions[_page];
 
-    MaterialButton _backButton = RaisedButton(
-      child: Text('Go Back'), 
+    MaterialButton _formControlButton(String text, {Color color, Color textColor, @required Function onPressed}) {
+      return RaisedButton(
+        child: Text(text),
+        color: color ?? Theme.of(context).primaryColor,
+        textColor: textColor ?? Theme.of(context).secondaryHeaderColor,
+        onPressed: onPressed,
+      );
+    }
+
+    MaterialButton _backButton = _formControlButton('Go Back', 
       onPressed: () {
-        setState(() { 
-          this._page--; 
-          });
+        setState(() { this._page--; });
       }
     );
 
-    MaterialButton _nextButton = RaisedButton(
-      child: Text('Continue'), 
-      onPressed: () {
+    MaterialButton _nextButton = _formControlButton('Continue',
+      // disables button if no choice has been made for the current question
+      onPressed: this._selections[_page] == null ? null : () {
         setState(() { this._page++; });
       }
     );
+
+    // FIXME: pressing back button while dialog is open will crash the app
+    Future<bool> _exitConfirmation() async {
+      return await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text('Are you sure?'),
+          content: Text('Exiting this survey without submitting will discard all your changes!'),
+          actions: [
+            FlatButton(
+              child: Text('Return to survey'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            FlatButton(
+              child: Text('Discard changes',
+                style: TextStyle(color: Theme.of(context).errorColor)
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              }
+            )
+          ]
+        )
+      ) ?? false;
+    }
     
-    return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Card(
-            child: QuestionPage(_currentQuestion,
-              currentSelection: _selections[_page] ?? '', 
-              //key: ObjectKey(_currentQuestion), // no need for key if stateless
-              onChanged: (String value) => setState(() {
-                _selections[_page] = value;
-              })
-            ) 
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // TODO: properly style buttons or implement better navigational scheme
-              if (_page > 0) _backButton,
-              if (_page < widget.survey.questions.length - 1) _nextButton,
-            ]
-          )
-        ]
-      )
+    return WillPopScope(
+      onWillPop: _exitConfirmation,
+      child: Scaffold(
+        appBar: AppBar(),
+        body: Center(child: Column(
+          children: [
+            Card(
+              child: QuestionPage(_currentQuestion,
+                currentSelection: _selections[_page] ?? '', 
+                //key: ObjectKey(_currentQuestion), // no need for key if stateless
+                onChanged: (String value) => setState(() {
+                  _selections[_page] = value;
+                })
+              ) 
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // TODO: properly style buttons or implement better navigational scheme
+                if (_page > 0) _backButton,
+                if (_page < widget.survey.questions.length - 1) _nextButton,
+              ]
+            )
+          ]
+        )
+      ))
     );
 
   }
@@ -79,20 +116,11 @@ class QuestionPage extends StatelessWidget {
   Widget _radioSelectionBuilder(List<String> choices) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: choices.map((String choice) => 
-        Padding(
-          padding: EdgeInsets.all(0.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Radio(
-                value: choice,
-                groupValue: currentSelection,
-                onChanged: onChanged,
-              ),
-              Text(choice)
-            ]
-          )
+      children: choices.map((String choice) => RadioListTile<String>(
+          title: Text(choice),
+          value: choice,
+          groupValue: currentSelection,
+          onChanged: onChanged,
         )
       ).toList()
     );
@@ -104,7 +132,16 @@ class QuestionPage extends StatelessWidget {
       padding: EdgeInsets.all(12.0),
       child: Column(
         children: [
-          Text(this.question.text),
+          Padding(
+            padding: EdgeInsets.fromLTRB(8, 15, 8, 20),
+            child: Text(this.question.text, 
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              )
+            )
+          ),
           _radioSelectionBuilder(this.question.choices)
         ]
       )
