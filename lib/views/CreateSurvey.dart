@@ -39,8 +39,25 @@ class _EditSurveyState extends State<EditSurvey> {
         children: [
           _titleField,
           if (widget.survey.questions != null) Expanded(
-            child: ListView(
-              children: widget.survey.questions.map((SurveyQuestion q) => EditSurveyQuestion(q))?.toList()
+            child: ReorderableListView(
+              header: Text('hello'),
+              padding: EdgeInsets.fromLTRB(10, 20, 10, 50),
+              children: 
+                widget.survey.questions.map((SurveyQuestion question) => 
+                  EditSurveyQuestion(question,
+                    key: UniqueKey()) // Key needed for reordering
+                )?.toList(),
+              onReorder: (int oldIndex, int newIndex) {
+                setState( () {
+                  if (newIndex > oldIndex) {
+                    newIndex -= 1;
+                  }
+                  final SurveyQuestion item = widget.survey.questions.removeAt(oldIndex);
+                  widget.survey.questions.insert(newIndex, item);
+                },
+              );
+          
+              }
             )
           )
         ]
@@ -49,27 +66,48 @@ class _EditSurveyState extends State<EditSurvey> {
   }
 }
 
-class EditSurveyQuestion extends StatelessWidget{
-  EditSurveyQuestion(this.question);
+class EditSurveyQuestion extends StatefulWidget{
+  EditSurveyQuestion(this.question, {Key key}) : super(key: key);
   final SurveyQuestion question;
 
   @override
+  State<StatefulWidget> createState() => _EditSurveyQuestionState();
+}
+
+class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
+  @override
   Widget build(BuildContext context) {
-    TextEditingController _questionTitleController = new TextEditingController(text: question.text);
+    TextEditingController _questionTitleController = new TextEditingController(text: widget.question.text);
+
+    Text _buildTitle() => Text(widget.question.text);
+    _questionTitleController.addListener(_buildTitle);
 
     return Card(
+      key: widget.key,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Icon(Icons.reorder),
             TextFormField(
+              style: TextStyle(
+                fontWeight: FontWeight.w500
+              ),
               controller: _questionTitleController, 
               decoration: InputDecoration(
                 labelText: 'Question',
-              )
+              ),
             ),
-            if (question.choices != null) ...question.choices.map((String choice) => EditSurveyQuestionChoice(choice))
+
+            if (widget.question.choices != null) 
+              ...widget.question.choices.map(
+                (String choice) => EditSurveyQuestionChoice(choice)
+              ),
+            
+            EditSurveyQuestionChoice(null)
           ]
         )
       )
@@ -81,20 +119,19 @@ class EditSurveyQuestion extends StatelessWidget{
 class EditSurveyQuestionChoice extends StatelessWidget {
   EditSurveyQuestionChoice(this.choice);
   final String choice;
+  // TODO: if choice is null, then the widget should add the new string to the list of choices
+  // TODO: if choice becomes '', then delete the choice
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _choiceController = new TextEditingController(text: choice);
-
-    return ListTile(
+    return Container(
+      child: ListTile(
       leading: Icon(Icons.radio_button_unchecked),
-      title: Container( 
-        height: 48,
-        child: TextFormField(
-          controller: _choiceController,
-          
+      title: TextFormField(
+          initialValue: choice,
           decoration: InputDecoration(
-            border: OutlineInputBorder()
+            //contentPadding: EdgeInsets.fromLTRB(10.0, 5, 10, 5),
+            border: UnderlineInputBorder()
           )
         )
       )

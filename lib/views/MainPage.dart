@@ -94,6 +94,8 @@ ListTile _surveyListing(BuildContext context, Map survey, [bool answered = false
   final String title = survey['title'];
   return ListTile(
     title: Text(survey['title'],
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontWeight: FontWeight.w700,
         color: answered ? Colors.grey : Colors.black,
@@ -101,6 +103,8 @@ ListTile _surveyListing(BuildContext context, Map survey, [bool answered = false
       )
     ),
     subtitle: Text('Created by: ${survey['author']}',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         color: answered ? Colors.grey[400] : Colors.grey[600],
         decoration: answered ? TextDecoration.lineThrough : TextDecoration.none,
