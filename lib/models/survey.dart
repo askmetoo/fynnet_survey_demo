@@ -15,11 +15,12 @@ class Survey {
   List<SurveyQuestion> questions;
   
 
-  Survey() {
+  Survey({this.title, this.questions}) {
     this.id = uuid.v4();
     this.author = 'Author'; // TODO: get value from logged in user
     this.published = false;
   }
+
 }
 
 /*
@@ -28,34 +29,19 @@ class Survey {
 class SurveyQuestion {
   String id;
   SurveyQuestionType type;
-  String question;
+  String text;
 
-  SurveyQuestion(this.type) {
+  List<String> choices;
+
+  SurveyQuestion(this.type, {this.text, this.choices}) {
     this.id = uuid.v4();
+    if (this.type == SurveyQuestionType.freeform && this.choices != null) {
+      throw 'freeform questions do not have choices';
+    }
   }
 }
 
 // Define survey question types
 enum SurveyQuestionType {
   radio, checkbox, dropdown, freeform
-}
-class RadioSurveyQuestion extends SurveyQuestion {
-  RadioSurveyQuestion() : super(SurveyQuestionType.radio);
-  List<_Choice> choices;
-}
-class CheckboxSurveyQuestion extends SurveyQuestion {
-  CheckboxSurveyQuestion() : super(SurveyQuestionType.checkbox);
-  List<_Choice> choices;
-}
-class DropdownSurveyQuestion extends SurveyQuestion {
-  DropdownSurveyQuestion() : super(SurveyQuestionType.dropdown);
-  List<_Choice> choices;
-}
-class FreeformSurveyQuestion extends SurveyQuestion {
-  FreeformSurveyQuestion() : super(SurveyQuestionType.freeform);
-}
-
-class _Choice {
-  String text;
-  bool selected;
 }

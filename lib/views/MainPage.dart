@@ -85,12 +85,12 @@ class _MainPageState extends State<MainPage> {
 Widget _buildSurveyList(List surveys) => Expanded(
   child: ListView.builder(
     itemCount: surveys.length,
-    itemBuilder: (BuildContext context, int index) => _surveyListing(surveys[index]),
+    itemBuilder: (BuildContext context, int index) => _surveyListing(context, surveys[index]),
   )
 );
 
 // Creates a ListTile of provided survey object to be fed into a ListView
-ListTile _surveyListing(Map survey, [bool answered = false]) {
+ListTile _surveyListing(BuildContext context, Map survey, [bool answered = false]) {
   final String title = survey['title'];
   return ListTile(
     title: Text(survey['title'],
@@ -114,6 +114,7 @@ ListTile _surveyListing(Map survey, [bool answered = false]) {
 
     onTap: () {
       print('You just tapped the survey $title.');
+      Navigator.pushNamed(context, '/respond');
     }
   );
 }
