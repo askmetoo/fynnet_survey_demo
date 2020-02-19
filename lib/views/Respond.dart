@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../models/survey.dart';
 
 class SurveyRespond extends StatefulWidget {
-
   // Specific survey being answered is fixed throughout widget lifetime
   SurveyRespond({Key key, this.survey}) : super(key: key);
   final Survey survey;
@@ -13,10 +12,14 @@ class SurveyRespond extends StatefulWidget {
 }
 
 class _SurveyRespondState extends State<SurveyRespond> {
-  int _page;
+  int _page; // current question
+  List<String> _selections; // list of answers the user has selected
 
-  _SurveyRespondState() {
+  @override // required to access widget object
+  void initState() {
     this._page = 0;
+    this._selections = List(widget.survey.questions.length);
+    super.initState();
   }
 
   @override
@@ -26,7 +29,9 @@ class _SurveyRespondState extends State<SurveyRespond> {
     MaterialButton _backButton = RaisedButton(
       child: Text('Go Back'), 
       onPressed: () {
-        setState(() { this._page--; });
+        setState(() { 
+          this._page--; 
+          });
       }
     );
 
@@ -42,7 +47,13 @@ class _SurveyRespondState extends State<SurveyRespond> {
       body: Column(
         children: [
           Card(
-            child: QuestionPage(_currentQuestion, key: ObjectKey(_currentQuestion)) // Key to differentiate between different QuestionPages
+            child: QuestionPage(_currentQuestion,
+              currentSelection: _selections[_page] ?? '', 
+              //key: ObjectKey(_currentQuestion), // no need for key if stateless
+              onChanged: (String value) => setState(() {
+                _selections[_page] = value;
+              })
+            ) 
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,19 +70,11 @@ class _SurveyRespondState extends State<SurveyRespond> {
   }
 }
 
-class QuestionPage extends StatefulWidget {
-  QuestionPage(this.question, {Key key}) : super(key: key);
+class QuestionPage extends StatelessWidget {
+  QuestionPage(this.question, {this.currentSelection, this.onChanged});
   final SurveyQuestion question;
-
-  @override
-  State<StatefulWidget> createState() => _QuestionPageState(question);
-
-}
-
-class _QuestionPageState extends State<QuestionPage> {
-  _QuestionPageState(this.question);
-  final SurveyQuestion question;
-  String _selection;
+  final String currentSelection;
+  final Function onChanged; // callback for updating parent state based on selected value
 
   Widget _radioSelectionBuilder(List<String> choices) {
     return Column(
@@ -84,12 +87,8 @@ class _QuestionPageState extends State<QuestionPage> {
             children: [
               Radio(
                 value: choice,
-                groupValue: _selection,
-                onChanged: (String value) {
-                  setState(() {
-                    _selection = value;
-                  });
-                },
+                groupValue: currentSelection,
+                onChanged: onChanged,
               ),
               Text(choice)
             ]
