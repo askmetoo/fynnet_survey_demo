@@ -67,7 +67,7 @@ class _EditSurveyState extends State<EditSurvey> {
               padding: EdgeInsets.fromLTRB(10, 20, 10, 50),
               children: 
                 widget.survey.questions.map((SurveyQuestion question) => 
-                  EditSurveyQuestion(question, key: ValueKey(question.id)) // Key needed for reordering
+                  EditSurveyQuestion(question, this, key: ValueKey(question.id)) // Key needed for reordering
                 )?.toList(),
               onReorder: (int oldIndex, int newIndex) {
                 setState( () {
@@ -89,8 +89,9 @@ class _EditSurveyState extends State<EditSurvey> {
 }
 
 class EditSurveyQuestion extends StatefulWidget{
-  EditSurveyQuestion(this.question, {Key key}) : super(key: key);
+  EditSurveyQuestion(this.question, this.parent, {Key key}) : super(key: key);
   final SurveyQuestion question;
+  final _EditSurveyState parent;
 
   @override
   State<StatefulWidget> createState() => _EditSurveyQuestionState();
@@ -124,22 +125,74 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
     super.initState();
   }
 
+  void _confirmDelete(SurveyQuestion question) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text('Are you sure?'),
+          content: Text('You are deleting this question: \"${question.text}\"'),
+          actions: [
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              color: Theme.of(context).errorColor,
+              child: Text('Delete',
+                style: TextStyle(color: Theme.of(context).dialogBackgroundColor)
+              ),
+              onPressed: () {
+                widget.parent.setState(() {
+                  widget.parent.widget.survey.questions.remove(question);
+                });
+                Navigator.of(context).pop();
+              }
+            )
+          ]
+        )
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       key: widget.key,
       child: ExpansionTile(
         key: PageStorageKey<String>(widget.question.id),
-        leading: Icon(Icons.reorder),
+        //leading: Icon(Icons.reorder),
         title: Text(widget.question.text, style: TextStyle(fontWeight: FontWeight.w700)),
-        trailing: Icon(Icons.edit),
+        trailing: PopupMenuButton(
+                  icon: Icon(Icons.more_vert),
+                  onSelected: (String value){
+                    switch(value) {
+                      case 'delete':
+                      _confirmDelete(widget.question);
+                      break;
+                      case 'edit':
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text('Delete', style: TextStyle(color: Theme.of(context).errorColor))
+                    ),
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Text('Edit')
+                    ),
+                  ]
+                ),
         children: [
           Padding(
             padding: EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                
                 TextFormField(
                   key: PageStorageKey<String>(widget.question.id + '_field'),
                   style: TextStyle(
