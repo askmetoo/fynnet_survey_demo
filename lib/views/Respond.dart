@@ -13,7 +13,7 @@ class SurveyRespond extends StatefulWidget {
 
 class _SurveyRespondState extends State<SurveyRespond> {
   int _page; // current question
-  List<String> _selections; // list of answers the user has selected
+  List<String> _selections; // list of answers (choice.id) the user has selected
 
   @override // required to access widget object
   void initState() {
@@ -90,8 +90,8 @@ class _SurveyRespondState extends State<SurveyRespond> {
               child: QuestionPage(_currentQuestion,
                 currentSelection: _selections[_page] ?? '', 
                 //key: ObjectKey(_currentQuestion), // no need for key if stateless
-                onChanged: (String value) => setState(() {
-                  _selections[_page] = value;
+                onChanged: (String id) => setState(() {
+                  _selections[_page] = id;
                 })
               ) 
             ),
@@ -117,12 +117,12 @@ class QuestionPage extends StatelessWidget {
   final String currentSelection;
   final Function onChanged; // callback for updating parent state based on selected value
 
-  Widget _radioSelectionBuilder(List<String> choices) {
+  Widget _radioSelectionBuilder(List<SurveyQuestionChoice> choices) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: choices.map((String choice) => RadioListTile<String>(
-          title: Text(choice),
-          value: choice,
+      children: choices.map((SurveyQuestionChoice choice) => RadioListTile<String>(
+          title: Text(choice.text),
+          value: choice.id,
           groupValue: currentSelection,
           onChanged: onChanged,
         )

@@ -31,13 +31,25 @@ class SurveyQuestion {
   SurveyQuestionType type;
   String text;
 
-  List<String> choices;
+  List<SurveyQuestionChoice> choices;
 
   SurveyQuestion(this.type, {this.text, this.choices}) {
     this.id = uuid.v4();
     if (this.type == SurveyQuestionType.freeform && this.choices != null) {
       throw 'freeform questions do not have choices';
     }
+  }
+}
+
+/*
+  SurveyQuestionChoice
+*/
+class SurveyQuestionChoice {
+  String id;
+  String text;
+
+  SurveyQuestionChoice([this.text = '']) {
+    this.id = uuid.v4();
   }
 }
 

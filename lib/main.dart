@@ -36,15 +36,30 @@ Survey sampleSurvey = new Survey(
   questions: [
     SurveyQuestion(SurveyQuestionType.radio,
       text: 'What is the first letter of the alphabet?',
-      choices: ['Alpha', 'Bravo', 'Charlie', 'Delta']
+      choices: [
+        SurveyQuestionChoice('Alpha'), 
+        SurveyQuestionChoice('Bravo'), 
+        SurveyQuestionChoice('Charlie'), 
+        SurveyQuestionChoice('Delta'), 
+      ]
     ),
     SurveyQuestion(SurveyQuestionType.radio,
       text: 'What is the second letter of the alphabet?',
-      choices: ['Alpha', 'Bravo', 'Charlie', 'Delta']
+      choices: [
+        SurveyQuestionChoice('Alpha'), 
+        SurveyQuestionChoice('Bravo'), 
+        SurveyQuestionChoice('Charlie'), 
+        SurveyQuestionChoice('Delta'), 
+      ]
     ),
     SurveyQuestion(SurveyQuestionType.radio,
       text: 'What is the third letter of the alphabet?',
-      choices: ['Alpha', 'Bravo', 'Charlie', 'Delta']
+      choices: [
+        SurveyQuestionChoice('Alpha'), 
+        SurveyQuestionChoice('Bravo'), 
+        SurveyQuestionChoice('Charlie'), 
+        SurveyQuestionChoice('Delta'), 
+      ]
     ),
   ]
 );
