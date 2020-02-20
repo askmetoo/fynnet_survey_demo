@@ -50,11 +50,10 @@ class _EditSurveyState extends State<EditSurvey> {
         title: Text('Creating survey')
       ),
 
-      // FOR DEBUG
-      floatingActionButton: FlatButton(
-        child: Text('Print survey'), 
-        onPressed: () { 
-          print('Title: ${widget.survey.title}, Question1: ${widget.survey.questions[0].text}, Choice A.1: ${widget.survey.questions[0].choices[0].text}'); 
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          setState(() { widget.survey.questions.add(new SurveyQuestion(SurveyQuestionType.radio)); });
         }
       ),
 
@@ -125,6 +124,7 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
     super.initState();
   }
 
+  // Opens up a confirmation dialog before deleting the question
   void _confirmDelete(SurveyQuestion question) {
       showDialog(
         context: context,
@@ -163,25 +163,26 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
       child: ExpansionTile(
         key: PageStorageKey<String>(widget.question.id),
         //leading: Icon(Icons.reorder),
-        title: Text(widget.question.text, style: TextStyle(fontWeight: FontWeight.w700)),
+        title: widget.question.text == '' ?
+          Text('<New question>', style: TextStyle(
+            fontWeight: FontWeight.w500, 
+            fontStyle: FontStyle.italic, 
+            color: Theme.of(context).disabledColor,
+          )) :
+          Text(widget.question.text, style: TextStyle(fontWeight: FontWeight.w700)),
         trailing: PopupMenuButton(
                   icon: Icon(Icons.more_vert),
                   onSelected: (String value){
                     switch(value) {
                       case 'delete':
                       _confirmDelete(widget.question);
-                      break;
-                      case 'edit':
+                      // left open for more options
                     }
                   },
                   itemBuilder: (BuildContext context) => [
                     PopupMenuItem(
                       value: 'delete',
                       child: Text('Delete', style: TextStyle(color: Theme.of(context).errorColor))
-                    ),
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: Text('Edit')
                     ),
                   ]
                 ),
