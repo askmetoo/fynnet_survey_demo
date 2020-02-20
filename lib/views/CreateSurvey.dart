@@ -35,6 +35,12 @@ class _EditSurveyState extends State<EditSurvey> {
 
     return Scaffold(
       appBar: AppBar(),
+      floatingActionButton: FlatButton(
+        child: Text('Print survey'), 
+        onPressed: () { 
+          print('Title: ${widget.survey.title}, Question1: ${widget.survey.questions[0].text}, Choice A.1: ${widget.survey.questions[0].choices}'); 
+        }
+      ),
       body: Column(
         children: [
           _titleField,
@@ -75,52 +81,95 @@ class EditSurveyQuestion extends StatefulWidget{
 }
 
 class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
+  TextEditingController _questionTitleController;
+
+  @override
+  void dispose() {
+    _questionTitleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    // Creates controller and adds listener -- runs only once on widget creation
+    _questionTitleController = new TextEditingController(text: widget.question.text);
+    _questionTitleController.addListener(() {
+      setState(() { widget.question.text = _questionTitleController.text; });
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    TextEditingController _questionTitleController = new TextEditingController(text: widget.question.text);
+    return ExpansionTile(
+        key: widget.key,
+        leading: Icon(Icons.reorder),
+        title: Text(widget.question.text, style: TextStyle(fontWeight: FontWeight.w700)),
+        trailing: Icon(Icons.edit),
+        children: [
+          Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500
+                  ),
+                  controller: _questionTitleController,
+                  decoration: InputDecoration(
+                    labelText: 'Question',
+                  ),
+                ),
 
-    Text _buildTitle() => Text(widget.question.text);
-    _questionTitleController.addListener(_buildTitle);
-
-    return Card(
-      key: widget.key,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.reorder),
-            TextFormField(
-              style: TextStyle(
-                fontWeight: FontWeight.w500
-              ),
-              controller: _questionTitleController, 
-              decoration: InputDecoration(
-                labelText: 'Question',
-              ),
-            ),
-
-            if (widget.question.choices != null) 
-              ...widget.question.choices.map(
-                (String choice) => EditSurveyQuestionChoice(choice)
-              ),
-            
-            EditSurveyQuestionChoice(null)
-          ]
-        )
-      )
+                // Editable field for each existing choice
+                if (widget.question.choices != null) 
+                  ...widget.question.choices.map(
+                    (String choice) => EditSurveyQuestionChoice(choice)
+                  ),
+                
+                // Blank editable field for creating a new choice
+                EditSurveyQuestionChoice(null)
+              ]
+            )
+          )
+        ]
     );
   }
   
 }
 
-class EditSurveyQuestionChoice extends StatelessWidget {
-  EditSurveyQuestionChoice(this.choice);
-  final String choice;
+class EditSurveyQuestionChoice extends StatefulWidget {
+  EditSurveyQuestionChoice(this.choice, {Key key}) : super(key: key);
+  String choice;
+
+  @override
+  State<StatefulWidget> createState() => new _EditSurveyQuestionChoiceState();
+}
+
+class _EditSurveyQuestionChoiceState extends State<EditSurveyQuestionChoice> {
   // TODO: if choice is null, then the widget should add the new string to the list of choices
   // TODO: if choice becomes '', then delete the choice
+  TextEditingController _choiceController;
+
+  @override
+  void dispose() {
+    _choiceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _choiceController = TextEditingController(text: widget.choice);
+    _choiceController.addListener(() {
+      setState(() {
+        widget.choice = _choiceController.text; //TODO: turn choice into an object so that we can pass in reference
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +177,7 @@ class EditSurveyQuestionChoice extends StatelessWidget {
       child: ListTile(
       leading: Icon(Icons.radio_button_unchecked),
       title: TextFormField(
-          initialValue: choice,
+          controller: _choiceController,
           decoration: InputDecoration(
             //contentPadding: EdgeInsets.fromLTRB(10.0, 5, 10, 5),
             border: UnderlineInputBorder()
