@@ -107,9 +107,7 @@ ListTile _surveyListing(BuildContext context, Survey survey, [bool answered = fa
 
     onTap: () {
       print('You just tapped the survey $title.');
-      Navigator.pushNamed(context, '/respond', arguments: {
-        'surveyId': survey.id
-      });
+      Navigator.pushNamed(context, '/respond', arguments: survey.id);
     }
   );
 }
