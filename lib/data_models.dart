@@ -5,7 +5,6 @@ import 'package:fynnet_survey_demo/data_interface.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
-
 // Tool for generating unique ids
 import 'package:uuid/uuid.dart';
 var uuid = Uuid();
@@ -98,16 +97,18 @@ class SurveyResponse {
   String userId;
   String surveyId;
 
-  Map<String,String> responses; // { SurveyQuestion.id : SurveyQuestionChoice.id }
+  //Map<String,String> responses; // { SurveyQuestion.id : SurveyQuestionChoice.id }
+  List<String> responses; // [ SurveyQuestionChoice.id ]
 
   SurveyResponse({this.userId, this.surveyId}) {
     Survey survey = getSurvey(id: surveyId);
-    this.responses = { for (SurveyQuestion q in survey.questions) q.id : null };
+    //this.responses = { for (SurveyQuestion q in survey.questions) q.id : null };
+    this.responses = List<String>(survey.questions.length);
   }
 
-  void addResponse(String questionId, String choiceId) {
-    this.responses[questionId] = choiceId;
-  }
+  //void addResponse(String questionId, String choiceId) {
+  //  this.responses[questionId] = choiceId;
+  //}
 
   bool matchUser(String userId) {
     return this.userId == userId;

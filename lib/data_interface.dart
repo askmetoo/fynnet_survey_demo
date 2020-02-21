@@ -35,7 +35,28 @@ bool addSurvey(Survey survey) {
     SampleDatabase.surveys.add(survey);
     return true;
   } else {
-    // survey already exists in database
     return false;
   }
+}
+
+SurveyResponse getResponse({String surveyId, String userId}) {
+  if (surveyId == null || userId == null) {
+    throw 'Both the surveyId and userId must be provided in getResponse';
+  } else {
+    return SampleDatabase.responses.firstWhere(
+      (SurveyResponse response) => response.surveyId == surveyId && response.userId == userId,
+      orElse: () => null 
+    );
+  }
+}
+
+// adds the provided SurveyResponse to the database. return false if SurveyResponse already exists
+bool addResponse(SurveyResponse response) {
+  if (getResponse(surveyId: response.surveyId, userId: response.userId) == null) {
+    SampleDatabase.responses.add(response);
+    return true;
+  } else {
+    return false;
+  }
+  
 }

@@ -73,4 +73,6 @@ class SampleDatabase {
       ]
     )
   ];
+
+  static final List<SurveyResponse> responses = [];
 }

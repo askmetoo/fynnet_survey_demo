@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fynnet_survey_demo/data_models.dart';
+import 'package:fynnet_survey_demo/data_interface.dart';
 
 class SurveyRespond extends StatefulWidget {
   // Specific survey being answered is fixed throughout widget lifetime
@@ -13,12 +14,29 @@ class SurveyRespond extends StatefulWidget {
 
 class _SurveyRespondState extends State<SurveyRespond> {
   int _page; // current question
-  List<String> _selections; // list of answers (choice.id) the user has selected
+  SurveyResponse _response;
+
+  _handleSubmit() async {
+    print('submitting response: ${_response.responses}');
+    if (addResponse(_response)) {
+      await showDialog(context: context,
+        builder: (context) => AlertDialog(title: Text('Submission successful'),
+          content: Text('Your responses have been successfully recorded!'),
+          actions: [
+            RaisedButton(
+              child: Text('Okay'), 
+              onPressed: () => Navigator.of(context).pop()
+            )
+          ]
+        )
+      ).then((_) => Navigator.of(context).pop());
+    }
+  }
 
   @override // required to access widget object
   void initState() {
     this._page = 0;
-    this._selections = List(widget.survey.questions.length);
+    this._response = SurveyResponse(surveyId: widget.survey.id, userId: 'TODO'); // TODO: get userId from logged in user
     super.initState();
   }
 
@@ -36,20 +54,24 @@ class _SurveyRespondState extends State<SurveyRespond> {
     }
 
     MaterialButton _backButton = _formControlButton('Go Back', 
-      onPressed: () {
+      // disables button if user is on the first page
+      onPressed: this._page == 0 ? null : () {
         setState(() { this._page--; });
       }
     );
 
     MaterialButton _nextButton = _formControlButton('Continue',
       // disables button if no choice has been made for the current question
-      onPressed: this._selections[_page] == null ? null : () {
+      onPressed: this._response.responses[_page] == null ? null : () {
         setState(() { this._page++; });
       }
     );
 
     MaterialButton _submitButton = _formControlButton('Submit',
-    onPressed: () {}
+      // enables button only if all questions have been responded
+      onPressed: this._response.responses.any((String e) => e == null) ? null : () {
+        _handleSubmit();
+      }
     );
 
     Future<bool> _exitConfirmation() async {
@@ -88,10 +110,10 @@ class _SurveyRespondState extends State<SurveyRespond> {
           children: [
             Card(
               child: QuestionPage(_currentQuestion,
-                currentSelection: _selections[_page] ?? '', 
+                currentSelection: this._response.responses[_page] ?? '', 
                 //key: ObjectKey(_currentQuestion), // no need for key if stateless
                 onChanged: (String id) => setState(() {
-                  _selections[_page] = id;
+                  this._response.responses[_page] = id;
                 })
               ) 
             ),
@@ -99,8 +121,8 @@ class _SurveyRespondState extends State<SurveyRespond> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // TODO: properly style buttons or implement better navigational scheme
-                if (_page > 0) _backButton,
-                if (_page < widget.survey.questions.length - 1) _nextButton,
+                _backButton,
+                _page < widget.survey.questions.length - 1 ? _nextButton : _submitButton,
               ]
             )
           ]
