@@ -23,7 +23,7 @@ bool addUser(User user) {
 }
 
 Survey getSurvey({String id}) {
-  assert(id == null, 'The survey id needs to be provided in getSurvey(...)');
+  assert(id != null, 'The survey id needs to be provided in getSurvey(...)');
   return SampleDatabase.surveys.firstWhere((Survey survey) => survey.id == id, orElse: () => null);
 }
 
@@ -32,7 +32,7 @@ List<Survey> getSurveys() {
 }
 
 Iterable<Survey> getSurveysFromUser({String userId}) {
-  assert(userId == null, 'The userId needs to be provided in getSurveyFromUser(...)');
+  assert(userId != null, 'The userId needs to be provided in getSurveyFromUser(...)');
   return SampleDatabase.surveys.where((Survey survey) => survey.author == userId);
 }
 

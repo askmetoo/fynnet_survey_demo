@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fynnet_survey_demo/data_interface.dart';
+import 'package:fynnet_survey_demo/data_models.dart';
 
 class LoginDialog extends StatefulWidget {
   @override
@@ -10,6 +12,21 @@ class _LoginDialogState extends State<LoginDialog>{
   final TextEditingController _passwordController = new TextEditingController();
 
   bool _signupAction = false;
+  bool _actionError = false;
+
+  void _handleButtonPress() {
+    User user = this._signupAction ?
+      _signUpUser(username: _usernameController.text, password: _passwordController.text) :
+      _logInUser(username: _usernameController.text, password: _passwordController.text);
+
+    if (user != null) {
+      setState(() { this._actionError = false; });
+      Navigator.of(context).pop();
+      Navigator.of(context).pushNamed('/account', arguments: user.id);
+    } else {
+      setState(() { this._actionError = true; });
+    }
+  }
 
   @override 
   Widget build(BuildContext context) {
@@ -27,6 +44,21 @@ class _LoginDialogState extends State<LoginDialog>{
           )
         ),
 
+        // Text to display if there is an error
+        if (this._actionError) Padding(
+          padding: EdgeInsets.all(2.0),
+          child: Text(
+            this._signupAction ? 
+              'A user with the username \"${_usernameController}\" already exists!' :
+              'Your username or password is incorrect. Please re-verify.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).errorColor,
+              
+            )
+          )
+        ),
+
         // Username Field
         Padding(
           padding: EdgeInsets.all(2.0),
@@ -39,6 +71,7 @@ class _LoginDialogState extends State<LoginDialog>{
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))
             ),
 
+            // TODO: validation!
             //validator: (String value) => value.isEmpty ? 'Username cannot be empty.' : null
           )
         ),
@@ -68,12 +101,7 @@ class _LoginDialogState extends State<LoginDialog>{
             textColor: Colors.white,
             padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.0)),
-            onPressed: () {
-              // TODO: implement communication with backend
-              print('${_usernameController.text} | ${_passwordController.text}');
-              Navigator.pop(context, true); // close dialog box
-              Navigator.pushNamed(context, '/account');
-            }
+            onPressed: _handleButtonPress
           )
         ),
 
@@ -95,5 +123,28 @@ class _LoginDialogState extends State<LoginDialog>{
       ],
 
     );
+  }
+}
+
+// returns the User only if both the username and password is correct, otherwise null
+User _logInUser({String username, String password}) {
+  User user = getUser(username: username);
+  if (user == null) { // username not found
+    return null;
+  }
+  if (user.hash == generateHash(password, user.id)) {
+    return user;
+  } else {
+    return null;
+  }
+}
+
+// returns null if a user with the same username is found
+User _signUpUser({String username, String password}) {
+  User newUser = User(username: username, password: password);
+  if (addUser(newUser)) {
+    return newUser;
+  } else {
+    return null;
   }
 }

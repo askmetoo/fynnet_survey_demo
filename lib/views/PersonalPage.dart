@@ -5,7 +5,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
 class PersonalPage extends StatefulWidget {
   PersonalPage({Key key, this.title, this.userId}) : super(key: key);
   final String title;
-  final String userId; // TODO
+  final String userId;
 
   @override
   _PersonalPageState createState() => _PersonalPageState();
@@ -14,6 +14,7 @@ class PersonalPage extends StatefulWidget {
 class _PersonalPageState extends State<PersonalPage> {
   @override
   Widget build(BuildContext context) {
+    print('userid inside personalpage: ${widget.userId}');
 
     // Defining tabs in page
     List<PersonalTab> _tabs = [
