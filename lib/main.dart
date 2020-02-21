@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'views/MainPage.dart';
-import 'views/PersonalPage.dart';
-import 'views/Respond.dart';
-import 'views/CreateSurvey.dart';
+import 'package:fynnet_survey_demo/views/MainPage.dart';
+import 'package:fynnet_survey_demo/views/PersonalPage.dart';
+import 'package:fynnet_survey_demo/views/Respond.dart';
+import 'package:fynnet_survey_demo/views/CreateSurvey.dart';
 
-import 'models/survey.dart';
+import 'package:fynnet_survey_demo/sample_database.dart';
 
 void main() => runApp(MyApp());
 
@@ -23,43 +23,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/' : (_) => MainPage(title: 'Survey App'),
         '/account' : (_) => PersonalPage(title: 'Survey'),
-        '/respond' : (_) => SurveyRespond(survey: sampleSurvey),
-        '/create' : (_) => EditSurvey(survey: sampleSurvey),
+        '/respond' : (_) => SurveyRespond(survey: SampleDatabase.surveys[0]),
+        '/create' : (_) => EditSurvey(survey: SampleDatabase.surveys[0]),
       }
     );
   }
 }
-
-
-Survey sampleSurvey = new Survey(
-  title: 'Sample survey #1',
-  questions: [
-    SurveyQuestion(SurveyQuestionType.radio,
-      text: 'What is the first letter of the alphabet?',
-      choices: [
-        SurveyQuestionChoice('Alpha'), 
-        SurveyQuestionChoice('Bravo'), 
-        SurveyQuestionChoice('Charlie'), 
-        SurveyQuestionChoice('Delta'), 
-      ]
-    ),
-    SurveyQuestion(SurveyQuestionType.radio,
-      text: 'What is the second letter of the alphabet?',
-      choices: [
-        SurveyQuestionChoice('Alpha'), 
-        SurveyQuestionChoice('Bravo'), 
-        SurveyQuestionChoice('Charlie'), 
-        SurveyQuestionChoice('Delta'), 
-      ]
-    ),
-    SurveyQuestion(SurveyQuestionType.radio,
-      text: 'What is the third letter of the alphabet?',
-      choices: [
-        SurveyQuestionChoice('Alpha'), 
-        SurveyQuestionChoice('Bravo'), 
-        SurveyQuestionChoice('Charlie'), 
-        SurveyQuestionChoice('Delta'), 
-      ]
-    ),
-  ]
-);

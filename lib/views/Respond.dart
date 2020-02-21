@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/survey.dart';
+import 'package:fynnet_survey_demo/data_models.dart';
 
 class SurveyRespond extends StatefulWidget {
   // Specific survey being answered is fixed throughout widget lifetime

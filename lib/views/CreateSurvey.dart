@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../models/survey.dart';
+import 'package:fynnet_survey_demo/data_models.dart';
 
 class EditSurvey extends StatefulWidget {
   EditSurvey({Key key, this.survey}) : super(key: key);

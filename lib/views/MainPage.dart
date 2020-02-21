@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'Login.dart';
+import 'package:fynnet_survey_demo/views/Login.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
