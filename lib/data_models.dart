@@ -20,9 +20,9 @@ class Survey {
   List<SurveyQuestion> questions;
   
 
-  Survey({this.title, this.questions}) {
+  Survey({this.title, this.author, this.questions}) {
     this.id = uuid.v4();
-    this.author = 'Author'; // TODO: get value from logged in user
+    this.author = this.author ?? 'Author'; // TODO: get value from logged in user
     this.published = false;
 
     this.questions = this.questions ?? <SurveyQuestion>[];

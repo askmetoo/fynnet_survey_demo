@@ -23,14 +23,17 @@ bool addUser(User user) {
 }
 
 Survey getSurvey({String id}) {
-  if (id == null) {
-    throw 'The survey id needs to be provided in getSurvey(...)';
-  }
+  assert(id == null, 'The survey id needs to be provided in getSurvey(...)');
   return SampleDatabase.surveys.firstWhere((Survey survey) => survey.id == id, orElse: () => null);
 }
 
 List<Survey> getSurveys() {
   return SampleDatabase.surveys;
+}
+
+Iterable<Survey> getSurveysFromUser({String userId}) {
+  assert(userId == null, 'The userId needs to be provided in getSurveyFromUser(...)');
+  return SampleDatabase.surveys.where((Survey survey) => survey.author == userId);
 }
 
 // adds the provided Survey to the database. return false if Survey already exists

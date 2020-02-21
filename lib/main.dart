@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      //home: MainPage(title: 'Survey App'),
       initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
     );

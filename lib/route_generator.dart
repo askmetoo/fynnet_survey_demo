@@ -16,15 +16,19 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (_) => MainPage(title: 'Survey App')
       );
     case '/account':
+      assert(args is String);
       return MaterialPageRoute(
-          builder: (_) => PersonalPage(title: 'My Account'));
+        builder: (_) => PersonalPage(title: 'My Account', userId: args)
+      );
     case '/respond':
       assert(args is String);
       return MaterialPageRoute(
-          builder: (_) => SurveyRespond(surveyId: args));
+        builder: (_) => SurveyRespond(surveyId: args)
+      );
     case '/create':
       return MaterialPageRoute(
-          builder: (_) => EditSurvey(survey: SampleDatabase.surveys[0]));
+        builder: (_) => EditSurvey(survey: SampleDatabase.surveys[0])
+      );
     default:
       return errorRoute;
   }

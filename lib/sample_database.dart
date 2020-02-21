@@ -8,6 +8,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
   final List<Survey> surveys = [
     Survey(
       title: 'Sample survey #1',
+      author: users[0].id, 
       questions: [
         SurveyQuestion(SurveyQuestionType.radio,
           text: 'What is the first letter of the alphabet?',
@@ -41,6 +42,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
 
     Survey(
       title: 'Sample Survey #2',
+      author: users[1].id, 
       questions: [
         SurveyQuestion(SurveyQuestionType.radio,
           text: 'What is your name',

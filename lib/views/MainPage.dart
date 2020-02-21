@@ -80,33 +80,31 @@ Widget _buildSurveyList(List surveys) => Expanded(
 
 // Creates a ListTile of provided survey object to be fed into a ListView
 ListTile _surveyListing(BuildContext context, Survey survey, [bool answered = false]) {
-  final String title = survey.title;
   return ListTile(
     title: Text(survey.title,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontWeight: FontWeight.w700,
-        color: answered ? Colors.grey : Colors.black,
+        color: answered ? Theme.of(context).disabledColor : Colors.black,
         decoration: answered ? TextDecoration.lineThrough : TextDecoration.none,
       )
     ),
-    subtitle: Text('Created by: ${survey.author}',
-      maxLines: 1,
+    subtitle: Text('Created by: ${getUser(id: survey.author).username}',
+      maxLines: 2,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
-        color: answered ? Colors.grey[400] : Colors.grey[600],
+        color: answered ? Theme.of(context).disabledColor : Colors.black54,
         decoration: answered ? TextDecoration.lineThrough : TextDecoration.none,
       )
     ),
     leading: Icon(
       Icons.comment, 
-      color: Colors.green[700]
+      color: Theme.of(context).primaryColor,
     ),
     trailing: Icon(Icons.keyboard_arrow_right),
 
     onTap: () {
-      print('You just tapped the survey $title.');
       Navigator.pushNamed(context, '/respond', arguments: survey.id);
     }
   );

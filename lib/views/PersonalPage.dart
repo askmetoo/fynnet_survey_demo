@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fynnet_survey_demo/data_interface.dart';
+import 'package:fynnet_survey_demo/data_models.dart';
 
 class PersonalPage extends StatefulWidget {
-  PersonalPage({Key key, this.title}) : super(key: key);
+  PersonalPage({Key key, this.title, this.userId}) : super(key: key);
   final String title;
+  final String userId; // TODO
 
   @override
   _PersonalPageState createState() => _PersonalPageState();
@@ -11,6 +14,33 @@ class PersonalPage extends StatefulWidget {
 class _PersonalPageState extends State<PersonalPage> {
   @override
   Widget build(BuildContext context) {
+
+    // Defining tabs in page
+    List<PersonalTab> _tabs = [
+      PersonalTab(
+        title: 'My Surveys',
+        icon: Icons.comment,
+        content: Card(
+          child: ListView(
+            children: getSurveysFromUser(userId: widget.userId).map((Survey survey) =>
+              _createSurveyListTile(survey)
+            ).toList()
+          )
+        ),
+      ),
+      PersonalTab(
+        title: 'Answered Surveys',
+        icon: Icons.check_box,
+        content: Card(
+          child: ListView(
+            children: getSurveysFromUser(userId: widget.userId).map((Survey survey) =>
+              _createSurveyListTile(survey)
+            ).toList()
+          )
+        ),
+      )
+    ];
+
     return DefaultTabController(
       length: _tabs.length,
 
@@ -36,62 +66,8 @@ class PersonalTab {
   PersonalTab({this.title, this.icon, this.content});
 }
 
-// Define the tabs that are shown in the PersonalPage
-List<PersonalTab> _tabs = [
-  PersonalTab(
-    title: 'My Surveys',
-    icon: Icons.comment,
-    content: personalSurveyTab,
-  ),
-  PersonalTab(
-    title: 'Answered Surveys',
-    icon: Icons.check_box,
-    content: personalAnsweredTab,
-  )
-];
-
-// Define the content in each tab
-Widget personalSurveyTab = Card(
-  //child: Expanded(
-    child: ListView(
-      children: [
-        _createSurveyListTile(
-          title: 'First survey blahblahblah',
-          subtitle: 'Created on Mar 20, 2020',
-          editAccess: true
-        ),
-        _createSurveyListTile(
-          title: 'Consumer market research survey',
-          subtitle: 'Created on Apr 12, 2020',
-          editAccess: true
-        ),
-      ]
-    )
-  //)
-);
-Widget personalAnsweredTab = Card(
-  //child: Expanded(
-    child: ListView(
-      children: [
-        _createSurveyListTile(
-          title: 'What flavor poptart are you?',
-          subtitle: 'Created on Mar 20, 2020',
-        ),
-        _createSurveyListTile(
-          title: 'Which Hogwarts house are you in?',
-          subtitle: 'Created on Apr 12, 2020',
-        ),
-        _createSurveyListTile(
-          title: 'What is your MBTI profile?',
-          subtitle: 'Created on Apr 12, 2020',
-        ),
-      ]
-    )
-  //)
-);
-
 // Creates a ListTile of the provided survey information, with different interactions depending on edit access
-Widget _createSurveyListTile({String title, String subtitle, bool editAccess = false}) {
+Widget _createSurveyListTile(Survey survey, {bool editAccess = false}) {
   Widget _respondButton = _buttonWithLabel('Respond', Icons.add_comment, () {});
   Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, () {});
   Widget _editButton = _buttonWithLabel('Edit', Icons.create, () {});
@@ -99,12 +75,12 @@ Widget _createSurveyListTile({String title, String subtitle, bool editAccess = f
   Widget _deleteButton = _buttonWithLabel('Delete', Icons.cancel, () {}, color: Colors.red[700]);
 
   return ExpansionTile(
-    title : Text(title, 
+    title : Text(survey.title, 
       style: TextStyle(
         fontWeight: FontWeight.w600,
       )
     ),
-    subtitle : Text(subtitle),
+    subtitle : Text(survey.id), // TODO: change to something more meaningful
 
     // Expands on tap to reveal additional options
     children : [
