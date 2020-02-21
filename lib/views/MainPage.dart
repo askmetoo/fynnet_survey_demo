@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:fynnet_survey_demo/data_models.dart';
+import 'package:fynnet_survey_demo/data_interface.dart';
+
 import 'package:fynnet_survey_demo/views/Login.dart';
 
 class MainPage extends StatefulWidget {
@@ -13,29 +16,15 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 
-  List<Map> surveys = [
-    {
-      'id' : '1',
-      'title' : 'First survey',
-      'author' : 'Albert A.',
-      'views' : 234,
-      'responses' : 10,
-    },
-    {
-      'id' : '2',
-      'title' : 'Second survey',
-      'author' : 'Brittany B.',
-      'views' : 74,
-      'responses' : 23,
-    },
-    {
-      'id' : '3',
-      'title' : 'This survey\'s name is too long to fit into one line, so it should be truncated',
-      'author' : 'Anonymous',
-      'views' : 9,
-      'responses' : 2,
-    }
-  ];
+  List<Survey> surveys;
+  TextEditingController _searchController;
+
+  @override
+  void initState() {
+    this.surveys = getSurveys();
+    this._searchController = TextEditingController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +53,15 @@ class _MainPageState extends State<MainPage> {
       body: Center(
         child: Column(
           children: [
-            Card(child: Text('Insert search box here')), // TODO: add search functionality
-
-            // Show the 5 (?) most viewed/answered surveys which the user (if logged in) has not yet answered or dismissed
-            Text('Our most popular surveys',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+            TextFormField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(16),
+                hintText: 'Search for a survey',
+                suffixIcon: Icon(Icons.search)
               )
-            ),
+            ), // TODO: add search functionality
+
             _buildSurveyList(surveys),
 
           ]
@@ -90,10 +79,10 @@ Widget _buildSurveyList(List surveys) => Expanded(
 );
 
 // Creates a ListTile of provided survey object to be fed into a ListView
-ListTile _surveyListing(BuildContext context, Map survey, [bool answered = false]) {
-  final String title = survey['title'];
+ListTile _surveyListing(BuildContext context, Survey survey, [bool answered = false]) {
+  final String title = survey.title;
   return ListTile(
-    title: Text(survey['title'],
+    title: Text(survey.title,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
@@ -102,7 +91,7 @@ ListTile _surveyListing(BuildContext context, Map survey, [bool answered = false
         decoration: answered ? TextDecoration.lineThrough : TextDecoration.none,
       )
     ),
-    subtitle: Text('Created by: ${survey['author']}',
+    subtitle: Text('Created by: ${survey.author}',
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
@@ -118,7 +107,9 @@ ListTile _surveyListing(BuildContext context, Map survey, [bool answered = false
 
     onTap: () {
       print('You just tapped the survey $title.');
-      Navigator.pushNamed(context, '/respond');
+      Navigator.pushNamed(context, '/respond', arguments: {
+        'surveyId': survey.id
+      });
     }
   );
 }

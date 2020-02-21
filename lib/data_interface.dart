@@ -1,5 +1,5 @@
 import 'package:fynnet_survey_demo/data_models.dart';
-import 'package:fynnet_survey_demo/sample_database.dart';
+import 'package:fynnet_survey_demo/sample_database.dart' as SampleDatabase;
 
 User getUser({String id, String username}) {
   if (id != null && username == null) {
@@ -27,6 +27,10 @@ Survey getSurvey({String id}) {
     throw 'The survey id needs to be provided in getSurvey(...)';
   }
   return SampleDatabase.surveys.firstWhere((Survey survey) => survey.id == id, orElse: () => null);
+}
+
+List<Survey> getSurveys() {
+  return SampleDatabase.surveys;
 }
 
 // adds the provided Survey to the database. return false if Survey already exists

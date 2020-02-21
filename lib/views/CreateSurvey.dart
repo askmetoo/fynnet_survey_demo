@@ -240,7 +240,7 @@ class _EditSurveyQuestionChoiceState extends State<EditSurveyQuestionChoice> {
   void _onFocusChange(SurveyQuestion question, SurveyQuestionChoice choice, String newText) {
     // parent required to redraw all choices
     print('focus changed on widget id ${choice.id}');
-    // TODO: less spaghettified method? pass in callback instead?
+    // TODO: less spaghettified method? pass in callback instead? inherited widget?
     widget.parent.setState(() {
       if ((choice.text ?? '').isEmpty && newText.isNotEmpty) {
         // add choice to list

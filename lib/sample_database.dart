@@ -1,12 +1,11 @@
 import 'package:fynnet_survey_demo/data_models.dart';
 
-class SampleDatabase {
-  static final List<User> users = [
+   final List<User> users = [
     User(username: 'test', password: 'test'),
     User(username: 'test2', password: 'test2'),
   ];
 
-  static final List<Survey> surveys = [
+  final List<Survey> surveys = [
     Survey(
       title: 'Sample survey #1',
       questions: [
@@ -74,5 +73,5 @@ class SampleDatabase {
     )
   ];
 
-  static final List<SurveyResponse> responses = [];
-}
+  final List<SurveyResponse> responses = [];
+

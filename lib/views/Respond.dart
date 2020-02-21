@@ -5,14 +5,15 @@ import 'package:fynnet_survey_demo/data_interface.dart';
 
 class SurveyRespond extends StatefulWidget {
   // Specific survey being answered is fixed throughout widget lifetime
-  SurveyRespond({Key key, this.survey}) : super(key: key);
-  final Survey survey;
+  SurveyRespond({Key key, this.surveyId}) : super(key: key);
+  final String surveyId;
 
   @override
   _SurveyRespondState createState() => _SurveyRespondState();
 }
 
 class _SurveyRespondState extends State<SurveyRespond> {
+  Survey _survey;
   int _page; // current question
   SurveyResponse _response;
 
@@ -30,19 +31,22 @@ class _SurveyRespondState extends State<SurveyRespond> {
           ]
         )
       ).then((_) => Navigator.of(context).pop());
+    } else {
+      throw 'Response unable to be added to database. Most likely the user has already answered the survey';
     }
   }
 
   @override // required to access widget object
   void initState() {
     this._page = 0;
-    this._response = SurveyResponse(surveyId: widget.survey.id, userId: 'TODO'); // TODO: get userId from logged in user
+    this._survey = getSurvey(id: widget.surveyId);
+    this._response = SurveyResponse(surveyId: widget.surveyId, userId: 'TODO'); // TODO: get userId from logged in user
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    SurveyQuestion _currentQuestion = widget.survey.questions[_page];
+    SurveyQuestion _currentQuestion = this._survey.questions[_page];
 
     MaterialButton _formControlButton(String text, {Color color, Color textColor, @required Function onPressed}) {
       return RaisedButton(
@@ -122,7 +126,7 @@ class _SurveyRespondState extends State<SurveyRespond> {
               children: [
                 // TODO: properly style buttons or implement better navigational scheme
                 _backButton,
-                _page < widget.survey.questions.length - 1 ? _nextButton : _submitButton,
+                _page < this._survey.questions.length - 1 ? _nextButton : _submitButton,
               ]
             )
           ]
