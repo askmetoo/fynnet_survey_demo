@@ -4,6 +4,7 @@ import 'package:fynnet_survey_demo/views/MainPage.dart';
 import 'package:fynnet_survey_demo/views/PersonalPage.dart';
 import 'package:fynnet_survey_demo/views/Respond.dart';
 import 'package:fynnet_survey_demo/views/CreateSurvey.dart';
+import 'package:fynnet_survey_demo/views/SurveyDataPage.dart';
 
 import 'package:fynnet_survey_demo/sample_database.dart' as SampleDatabase;
 
@@ -28,6 +29,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/create':
       return MaterialPageRoute(
         builder: (_) => EditSurvey(survey: SampleDatabase.surveys[0])
+      );
+    case '/results':
+      return MaterialPageRoute(
+        builder: (_) => SurveyDataPage(surveyId: SampleDatabase.surveys[2].id)
       );
     default:
       return errorRoute;
