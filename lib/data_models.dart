@@ -97,13 +97,12 @@ class SurveyResponse {
   String userId;
   String surveyId;
 
-  //Map<String,String> responses; // { SurveyQuestion.id : SurveyQuestionChoice.id }
   List<String> responses; // [ SurveyQuestionChoice.id ]
 
-  SurveyResponse({this.userId, this.surveyId}) {
+  SurveyResponse({this.userId, this.surveyId, this.responses}) {
     Survey survey = getSurvey(id: surveyId);
     //this.responses = { for (SurveyQuestion q in survey.questions) q.id : null };
-    this.responses = List<String>(survey.questions.length);
+    this.responses = this.responses ?? List<String>(survey.questions.length);
   }
 
   //void addResponse(String questionId, String choiceId) {

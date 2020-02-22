@@ -12,10 +12,41 @@ class PersonalPage extends StatefulWidget {
 }
 
 class _PersonalPageState extends State<PersonalPage> {
+  List<Widget> _createSurveysList() {
+    Iterable<Survey> surveys = getSurveysFromUser(userId: widget.userId);
+    return surveys.length == 0 ? 
+      [
+        Padding(padding: EdgeInsets.all(36),
+          child: Text('No surveys found', 
+            textAlign: TextAlign.center, 
+            style: TextStyle(
+              fontSize: 18.0, 
+              color: Theme.of(context).disabledColor
+            )
+          )
+        )
+      ] :
+      surveys.map((Survey survey) => _createSurveyListTile(survey)).toList();
+  } 
+  List<Widget> _createResponsesList() {
+    Iterable<SurveyResponse> responses = getResponsesByUser(widget.userId);
+    return responses.length == 0 ? 
+      [
+        Padding(padding: EdgeInsets.all(36),
+          child: Text('No responses found', 
+            textAlign: TextAlign.center, 
+            style: TextStyle(
+              fontSize: 18.0, 
+              color: Theme.of(context).disabledColor
+            )
+          )
+        )
+      ] :
+      responses.map((SurveyResponse response) => _createResponseListTile(response)).toList();
+  } 
+
   @override
   Widget build(BuildContext context) {
-    print('userid inside personalpage: ${widget.userId}');
-
     // Defining tabs in page
     List<PersonalTab> _tabs = [
       PersonalTab(
@@ -23,9 +54,7 @@ class _PersonalPageState extends State<PersonalPage> {
         icon: Icons.comment,
         content: Card(
           child: ListView(
-            children: getSurveysFromUser(userId: widget.userId).map((Survey survey) =>
-              _createSurveyListTile(survey)
-            ).toList()
+            children: _createSurveysList()
           )
         ),
       ),
@@ -34,8 +63,8 @@ class _PersonalPageState extends State<PersonalPage> {
         icon: Icons.check_box,
         content: Card(
           child: ListView(
-            children: getSurveysFromUser(userId: widget.userId).map((Survey survey) =>
-              _createSurveyListTile(survey)
+            children: getResponsesByUser(widget.userId).map((SurveyResponse response) =>
+              _createResponseListTile(response)
             ).toList()
           )
         ),
@@ -67,11 +96,11 @@ class PersonalTab {
   PersonalTab({this.title, this.icon, this.content});
 }
 
-// Creates a ListTile of the provided survey information, with different interactions depending on edit access
-Widget _createSurveyListTile(Survey survey, {bool editAccess = false}) {
-  Widget _respondButton = _buttonWithLabel('Respond', Icons.add_comment, () {});
+// Creates a ListTile of the provided survey information, with different interactions depending on published status
+Widget _createSurveyListTile(Survey survey) {
   Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, () {});
   Widget _editButton = _buttonWithLabel('Edit', Icons.create, () {});
+  Widget _publishButton = _buttonWithLabel('Publish', Icons.publish, () {});
   Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () {});
   Widget _deleteButton = _buttonWithLabel('Delete', Icons.cancel, () {}, color: Colors.red[700]);
 
@@ -88,15 +117,41 @@ Widget _createSurveyListTile(Survey survey, {bool editAccess = false}) {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: editAccess ? [
-          // Buttons that show when user has edit access
+        children: [
+          survey.published ? _previewButton : _editButton,
+          survey.published ? _resultsButton : _publishButton,
+          _deleteButton
+        ]
+      )
+    ]
+  );
+}
+
+// Creates a ListTile of the provided survey information, with different interactions depending on published status
+Widget _createResponseListTile(SurveyResponse response) {
+  Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, () {});
+  Widget _editButton = _buttonWithLabel('Edit', Icons.edit, () {});
+  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () {});
+
+  Survey survey = getSurvey(id: response.surveyId);
+  User author = getUser(id: survey.author);
+
+  return ExpansionTile(
+    title : Text(survey.title, 
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+      )
+    ),
+    subtitle : Text('Created by: ${author.username}'),
+
+    // Expands on tap to reveal additional options
+    children : [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
           _previewButton,
           _editButton,
-          _resultsButton,
-          _deleteButton
-        ] : [
-          // Buttons that show when user does not have edit access
-          _respondButton,
           _resultsButton
         ]
       )

@@ -11,7 +11,7 @@ User getUser({String id, String username}) {
   }
 }
 
-// adds the provided User to the database. return false if username already exists
+// adds the provided User to the database. returns false if username already exists
 bool addUser(User user) {
   if (getUser(username: user.username) == null) {
     SampleDatabase.users.add(user);
@@ -36,7 +36,7 @@ Iterable<Survey> getSurveysFromUser({String userId}) {
   return SampleDatabase.surveys.where((Survey survey) => survey.author == userId);
 }
 
-// adds the provided Survey to the database. return false if Survey already exists
+// adds the provided Survey to the database. returns false if Survey already exists
 bool addSurvey(Survey survey) {
   if (getSurvey(id: survey.id) == null) {
     SampleDatabase.surveys.add(survey);
@@ -51,13 +51,21 @@ SurveyResponse getResponse({String surveyId, String userId}) {
     throw 'Both the surveyId and userId must be provided in getResponse';
   } else {
     return SampleDatabase.responses.firstWhere(
-      (SurveyResponse response) => response.surveyId == surveyId && response.userId == userId,
+      (SurveyResponse response) => response.matchSurvey(surveyId) && response.matchUser(userId),
       orElse: () => null 
     );
   }
 }
 
-// adds the provided SurveyResponse to the database. return false if SurveyResponse already exists
+Iterable<SurveyResponse> getResponsesBySurvey(String surveyId) {
+  return SampleDatabase.responses.where((SurveyResponse response) => response.matchSurvey(surveyId));
+}
+
+Iterable<SurveyResponse> getResponsesByUser(String userId) {
+  return SampleDatabase.responses.where((SurveyResponse response) => response.matchUser(userId));
+}
+
+// adds the provided SurveyResponse to the database. returns false if SurveyResponse already exists
 bool addResponse(SurveyResponse response) {
   if (getResponse(surveyId: response.surveyId, userId: response.userId) == null) {
     SampleDatabase.responses.add(response);
