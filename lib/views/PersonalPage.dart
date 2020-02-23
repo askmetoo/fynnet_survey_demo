@@ -26,7 +26,7 @@ class _PersonalPageState extends State<PersonalPage> {
           )
         )
       ] :
-      surveys.map((Survey survey) => _createSurveyListTile(survey)).toList();
+      surveys.map((Survey survey) => _createSurveyListTile(context, survey)).toList();
   } 
   List<Widget> _createResponsesList() {
     Iterable<SurveyResponse> responses = getResponsesByUser(widget.userId);
@@ -42,7 +42,7 @@ class _PersonalPageState extends State<PersonalPage> {
           )
         )
       ] :
-      responses.map((SurveyResponse response) => _createResponseListTile(response)).toList();
+      responses.map((SurveyResponse response) => _createResponseListTile(context, response)).toList();
   } 
 
   @override
@@ -64,7 +64,7 @@ class _PersonalPageState extends State<PersonalPage> {
         content: Card(
           child: ListView(
             children: getResponsesByUser(widget.userId).map((SurveyResponse response) =>
-              _createResponseListTile(response)
+              _createResponseListTile(context, response)
             ).toList()
           )
         ),
@@ -97,12 +97,14 @@ class PersonalTab {
 }
 
 // Creates a ListTile of the provided survey information, with different interactions depending on published status
-Widget _createSurveyListTile(Survey survey) {
+Widget _createSurveyListTile(BuildContext context, Survey survey) {
   Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, () {});
   Widget _editButton = _buttonWithLabel('Edit', Icons.create, () {});
   Widget _publishButton = _buttonWithLabel('Publish', Icons.publish, () {});
-  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () {});
+  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () => Navigator.of(context).pushNamed('/results', arguments: survey.id));
   Widget _deleteButton = _buttonWithLabel('Delete', Icons.cancel, () {}, color: Colors.red[700]);
+
+
 
   return ExpansionTile(
     title : Text(survey.title, 
@@ -128,10 +130,10 @@ Widget _createSurveyListTile(Survey survey) {
 }
 
 // Creates a ListTile of the provided survey information, with different interactions depending on published status
-Widget _createResponseListTile(SurveyResponse response) {
+Widget _createResponseListTile(BuildContext context, SurveyResponse response) {
   Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, () {});
   Widget _editButton = _buttonWithLabel('Edit', Icons.edit, () {});
-  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () {});
+  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () => Navigator.of(context).pushNamed('/results', arguments: response.surveyId));
 
   Survey survey = getSurvey(id: response.surveyId);
   User author = getUser(id: survey.author);

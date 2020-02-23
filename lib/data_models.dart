@@ -132,6 +132,10 @@ class DataPoint {
 
 class DataSeries {
   List<DataPoint> series;
+
+  int get length => series.length;
+  int get total => series.map((d) => d.freq).reduce((a, b) => a + b);
+
   DataSeries([this.series]) {
     this.series = this.series ?? <DataPoint>[];
   }

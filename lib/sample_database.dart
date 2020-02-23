@@ -2,8 +2,15 @@ import 'package:fynnet_survey_demo/data_models.dart';
 
    final List<User> users = [
     User(username: 'test', password: 'test'),
+    User(username: 'test1', password: 'test1'),
     User(username: 'test2', password: 'test2'),
     User(username: 'test3', password: 'test3'),
+    User(username: 'test4', password: 'test4'),
+    User(username: 'test5', password: 'test5'),
+    User(username: 'test6', password: 'test6'),
+    User(username: 'test7', password: 'test7'),
+    User(username: 'test8', password: 'test8'),
+    User(username: 'test9', password: 'test9'),
   ];
 
   final List<Survey> surveys = [
@@ -174,7 +181,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
         surveys[2].questions[0]: surveys[2].questions[0].choices[0],
         surveys[2].questions[1]: surveys[2].questions[1].choices[0],
         surveys[2].questions[2]: surveys[2].questions[2].choices[0],
-        surveys[2].questions[3]: surveys[2].questions[3].choices[2],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[4],
       }
     ),
     SurveyResponse(
@@ -183,8 +190,78 @@ import 'package:fynnet_survey_demo/data_models.dart';
       responses: {
         surveys[2].questions[0]: surveys[2].questions[0].choices[2],
         surveys[2].questions[1]: surveys[2].questions[1].choices[2],
-        surveys[2].questions[2]: surveys[2].questions[2].choices[4],
-        surveys[2].questions[3]: surveys[2].questions[3].choices[4],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[2],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[0],
+      }
+    ),
+    SurveyResponse(
+      surveyId: surveys[2].id,
+      userId: users[3].id,
+      responses: {
+        surveys[2].questions[0]: surveys[2].questions[0].choices[0],
+        surveys[2].questions[1]: surveys[2].questions[1].choices[0],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[2],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[0],
+      }
+    ),
+    SurveyResponse(
+      surveyId: surveys[2].id,
+      userId: users[4].id,
+      responses: {
+        surveys[2].questions[0]: surveys[2].questions[0].choices[1],
+        surveys[2].questions[1]: surveys[2].questions[1].choices[1],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[0],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[0],
+      }
+    ),
+    SurveyResponse(
+      surveyId: surveys[2].id,
+      userId: users[5].id,
+      responses: {
+        surveys[2].questions[0]: surveys[2].questions[0].choices[0],
+        surveys[2].questions[1]: surveys[2].questions[1].choices[0],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[0],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[0],
+      }
+    ),
+    SurveyResponse(
+      surveyId: surveys[2].id,
+      userId: users[6].id,
+      responses: {
+        surveys[2].questions[0]: surveys[2].questions[0].choices[0],
+        surveys[2].questions[1]: surveys[2].questions[1].choices[0],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[0],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[1],
+      }
+    ),
+    SurveyResponse(
+      surveyId: surveys[2].id,
+      userId: users[7].id,
+      responses: {
+        surveys[2].questions[0]: surveys[2].questions[0].choices[1],
+        surveys[2].questions[1]: surveys[2].questions[1].choices[1],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[0],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[1],
+      }
+    ),
+    SurveyResponse(
+      surveyId: surveys[2].id,
+      userId: users[8].id,
+      responses: {
+        surveys[2].questions[0]: surveys[2].questions[0].choices[1],
+        surveys[2].questions[1]: surveys[2].questions[1].choices[0],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[3],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[2],
+      }
+    ),
+    SurveyResponse(
+      surveyId: surveys[2].id,
+      userId: users[9].id,
+      responses: {
+        surveys[2].questions[0]: surveys[2].questions[0].choices[1],
+        surveys[2].questions[1]: surveys[2].questions[1].choices[0],
+        surveys[2].questions[2]: surveys[2].questions[2].choices[1],
+        surveys[2].questions[3]: surveys[2].questions[3].choices[0],
       }
     ),
   ];

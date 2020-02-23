@@ -31,8 +31,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (_) => EditSurvey(survey: SampleDatabase.surveys[0])
       );
     case '/results':
+      assert(args is String);
       return MaterialPageRoute(
-        builder: (_) => SurveyDataPage(surveyId: SampleDatabase.surveys[2].id)
+        builder: (_) => SurveyDataPage(surveyId: args)
       );
     default:
       return errorRoute;

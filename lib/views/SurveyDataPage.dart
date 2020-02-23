@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as Charts;
+import 'package:flutter/rendering.dart';
 
 import 'package:fynnet_survey_demo/data_models.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
@@ -26,10 +27,13 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
         padding: EdgeInsets.all(12.0),
         child: Column(
           children: [
-            Text(question.text),
+            Text(question.text, style: TextStyle(fontSize: 18)),
+            Divider(thickness: 1),
+            SurveyDataTable(data: this.data[index]),
             //Row(
             //  children: [
-                SimpleBarChart(id: question.id, data: this.data[index])
+                //SimpleBarChart(id: question.id, data: this.data[index]),
+                SimplePieChart(id: question.id, data: this.data[index])
             //  ]
             //)
           ]
@@ -77,6 +81,29 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
   }
 }
 
+class SurveyDataTable extends StatelessWidget {
+  final DataSeries data;
+  SurveyDataTable({this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      columns: [
+        DataColumn(label: Text('Option')),
+        DataColumn(label: Text('Total')),
+        DataColumn(label: Text('Percent')),
+      ],
+      rows: data.series.map((DataPoint d) => DataRow(
+        cells: [
+          DataCell(Text(d.text)),
+          DataCell(Text('${d.freq}')),
+          DataCell(Text('${(d.freq/this.data.total*100).toStringAsFixed(1)}%'))
+        ]
+      )).toList()
+    );
+  }
+}
+
 class SimpleBarChart extends StatelessWidget {
   final DataSeries data;
   final String id;
@@ -84,10 +111,11 @@ class SimpleBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(this.data);
     return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
-      height: 200,
+      width: MediaQuery.of(context).size.width,
+      height: 250,
+      padding: EdgeInsets.all(10),
+      alignment: AlignmentDirectional(0, 5),
       child: Charts.BarChart([
         Charts.Series<DataPoint,String>(
           id: this.id,
@@ -95,8 +123,57 @@ class SimpleBarChart extends StatelessWidget {
 
           domainFn: (DataPoint d, int i) => d.text,
           measureFn: (DataPoint d, int i) => d.freq,
+
+          colorFn: (DataPoint d, int i) => Charts.MaterialPalette.getOrderedPalettes(this.data.length)[i].shadeDefault
         ) 
-      ])
+      ], animate: true, animationDuration: Duration(seconds: 1),
+      domainAxis: Charts.OrdinalAxisSpec(
+        renderSpec: Charts.SmallTickRendererSpec(
+          labelRotation: 22,
+          labelAnchor: Charts.TickLabelAnchor.after
+        )
+      )
+    )
+    );
+  }
+}
+
+class SimplePieChart extends StatelessWidget {
+  final DataSeries data;
+  final String id;
+  SimplePieChart({this.data, this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 200,
+      padding: EdgeInsets.all(10),
+      alignment: AlignmentDirectional(0, 5),
+      child: Charts.PieChart([
+        Charts.Series<DataPoint,String>(
+          id: this.id,
+          data: this.data.series,
+
+          domainFn: (DataPoint d, int i) => d.text,
+          measureFn: (DataPoint d, int i) => d.freq,
+
+          colorFn: (DataPoint d, int i) => Charts.MaterialPalette.getOrderedPalettes(this.data.length)[i].shadeDefault,
+          labelAccessorFn: (DataPoint d, int i) => '${d.freq}'
+        ) 
+      ], animate: true, animationDuration: Duration(seconds: 1),
+      defaultRenderer: Charts.ArcRendererConfig(
+        strokeWidthPx: 3,
+        arcRendererDecorators: [Charts.ArcLabelDecorator(
+          labelPosition: Charts.ArcLabelPosition.inside,
+          insideLabelStyleSpec: Charts.TextStyleSpec(fontSize: 16, color: Charts.Color.white)
+        )]
+      ),
+      behaviors: [
+        Charts.DatumLegend(position: Charts.BehaviorPosition.end),
+      ]
+      
+    )
     );
   }
 }
