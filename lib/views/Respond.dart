@@ -15,6 +15,7 @@ class SurveyRespond extends StatefulWidget {
 class _SurveyRespondState extends State<SurveyRespond> {
   Survey _survey;
   int _page; // current question
+  SurveyQuestion _currentQuestion; // current question
   SurveyResponse _response;
 
   _handleSubmit() async {
@@ -40,14 +41,13 @@ class _SurveyRespondState extends State<SurveyRespond> {
   void initState() {
     this._page = 0;
     this._survey = getSurvey(id: widget.surveyId);
+    this._currentQuestion = _survey.questions[0];
     this._response = SurveyResponse(surveyId: widget.surveyId, userId: 'TODO'); // TODO: get userId from logged in user
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    SurveyQuestion _currentQuestion = this._survey.questions[_page];
-
     MaterialButton _formControlButton(String text, {Color color, Color textColor, @required Function onPressed}) {
       return RaisedButton(
         child: Text(text),
@@ -59,21 +59,27 @@ class _SurveyRespondState extends State<SurveyRespond> {
 
     MaterialButton _backButton = _formControlButton('Go Back', 
       // disables button if user is on the first page
-      onPressed: this._page == 0 ? null : () {
-        setState(() { this._page--; });
+      onPressed: _currentQuestion == _survey.questions[0] ? null : () {
+        setState(() { 
+          int i = _survey.questions.indexOf(_currentQuestion) - 1; 
+          _currentQuestion = _survey.questions[i];
+        });
       }
     );
 
     MaterialButton _nextButton = _formControlButton('Continue',
       // disables button if no choice has been made for the current question
-      onPressed: this._response.responses[_page] == null ? null : () {
-        setState(() { this._page++; });
+      onPressed: this._response.responses[_currentQuestion] == null ? null : () {
+        setState(() { 
+          int i = _survey.questions.indexOf(_currentQuestion) + 1; 
+          _currentQuestion = _survey.questions[i];
+        });
       }
     );
 
     MaterialButton _submitButton = _formControlButton('Submit',
       // enables button only if all questions have been responded
-      onPressed: this._response.responses.any((String e) => e == null) ? null : () {
+      onPressed: this._response.responses.values.any((e) => e == null) ? null : () {
         _handleSubmit();
       }
     );
@@ -114,10 +120,10 @@ class _SurveyRespondState extends State<SurveyRespond> {
           children: [
             Card(
               child: QuestionPage(_currentQuestion,
-                currentSelection: this._response.responses[_page] ?? '', 
+                currentSelection: this._response.responses[_currentQuestion]?.id ?? '', 
                 //key: ObjectKey(_currentQuestion), // no need for key if stateless
-                onChanged: (String id) => setState(() {
-                  this._response.responses[_page] = id;
+                onChanged: (String choiceId) => setState(() {
+                  this._response.responses[_currentQuestion] = this._currentQuestion.choices.firstWhere((c) => c.id == choiceId);
                 })
               ) 
             ),
@@ -126,7 +132,7 @@ class _SurveyRespondState extends State<SurveyRespond> {
               children: [
                 // TODO: properly style buttons or implement better navigational scheme
                 _backButton,
-                _page < this._survey.questions.length - 1 ? _nextButton : _submitButton,
+                _currentQuestion != this._survey.questions.last ? _nextButton : _submitButton,
               ]
             )
           ]

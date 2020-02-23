@@ -73,5 +73,12 @@ bool addResponse(SurveyResponse response) {
   } else {
     return false;
   }
-  
 }
+
+// Responses are assumed to be from the same survey.
+List<DataSeries> createDataSeriesFromResponses(List<SurveyResponse> responses, {String surveyId}) {
+  Survey survey = getSurvey(id: surveyId ?? responses[0].surveyId);
+  //List<String> questionText = survey.questions.map((q) => q.text);
+  return null;
+}
+

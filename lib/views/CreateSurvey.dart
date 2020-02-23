@@ -103,7 +103,7 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
   // Creates a new Choice object for new choices to be written to. 
   // This will be added to the existing list of Choices in this Question
   void _createNewChoice() {
-    this._newChoice = new SurveyQuestionChoice();
+    this._newChoice = new SurveyQuestionChoice(questionId: widget.question.id);
   }
 
   @override

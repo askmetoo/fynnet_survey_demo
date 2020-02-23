@@ -49,11 +49,11 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
 
     // This iterates through *each* user and *each* question, with O(n*m) time!!
     // TODO: implement some sort of mapreduce for data aggregation
-    this.responses.forEach((SurveyResponse userResponse) {
-      userResponse.responses.asMap().forEach((int index, String choiceId) {
-        this.data[index].firstWhere((c) => c.choice == choiceId).freq += 1;
-      });
-    });
+    //this.responses.forEach((SurveyResponse userResponse) {
+    //  userResponse.responses.forEach((SurveyQuestion question, SurveyQuestionChoice choice) {
+    //    this.data[index].firstWhere((c) => c.choice == choice.text).freq += 1;
+    //  });
+    //});
 
     super.initState();
   }

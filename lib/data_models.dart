@@ -40,8 +40,8 @@ class SurveyQuestion {
 
   List<SurveyQuestionChoice> choices;
 
-  SurveyQuestion(this.type, {this.text = '', this.choices}) {
-    this.id = uuid.v4();
+  SurveyQuestion(this.type, {this.text = '', this.choices, this.id}) {
+    this.id = this.id ?? uuid.v4();
     if (this.type == SurveyQuestionType.freeform && this.choices != null) {
       throw 'freeform questions do not have choices';
     }
@@ -55,9 +55,10 @@ class SurveyQuestion {
 */
 class SurveyQuestionChoice {
   String id;
+  String questionId;
   String text;
 
-  SurveyQuestionChoice([this.text = '']) {
+  SurveyQuestionChoice({this.text = '', this.questionId}) {
     this.id = uuid.v4();
   }
 }
@@ -97,12 +98,12 @@ class SurveyResponse {
   String userId;
   String surveyId;
 
-  List<String> responses; // [ SurveyQuestionChoice.id ]
+  Map<SurveyQuestion, SurveyQuestionChoice> responses;
 
   SurveyResponse({this.userId, this.surveyId, this.responses}) {
     Survey survey = getSurvey(id: surveyId);
     //this.responses = { for (SurveyQuestion q in survey.questions) q.id : null };
-    this.responses = this.responses ?? List<String>(survey.questions.length);
+    this.responses = this.responses ?? Map<SurveyQuestion, SurveyQuestionChoice>();
   }
 
   //void addResponse(String questionId, String choiceId) {
@@ -115,5 +116,27 @@ class SurveyResponse {
 
   bool matchSurvey(String surveyId) {
     return this.surveyId == surveyId;
+  }
+}
+
+class DataPoint {
+  final String text;
+  int freq;
+
+  DataPoint(this.text, [this.freq = 0]);
+
+  void increment() {
+    this.freq++;
+  }
+}
+
+class DataSeries {
+  List<DataPoint> series;
+  DataSeries([this.series]) {
+    this.series = this.series ?? <DataPoint>[];
+  }
+
+  void addDataPoint(DataPoint dataPoint) {
+    this.series.add(dataPoint);
   }
 }
