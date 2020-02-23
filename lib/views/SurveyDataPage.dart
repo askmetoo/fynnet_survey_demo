@@ -15,7 +15,7 @@ class SurveyDataPage extends StatefulWidget {
 class _SurveyDataPageState extends State<SurveyDataPage> {
   Survey survey;
   List<SurveyResponse> responses;
-  List<List<DataPoint>> data;
+  List<DataSeries> data;
 
   // TODO: have SurveyQuestionChoice also contain question id?
   Widget _buildQuestionResults(int index) {
@@ -42,19 +42,7 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
   void initState() {
     this.survey = getSurvey(id: widget.surveyId);
     this.responses = getResponsesBySurvey(widget.surveyId).toList();
-      
-    this.data = survey.questions.map(
-      (q) => [ for (SurveyQuestionChoice c in q.choices) DataPoint(choice: c.id, freq: 0) ]
-    ).toList();
-
-    // This iterates through *each* user and *each* question, with O(n*m) time!!
-    // TODO: implement some sort of mapreduce for data aggregation
-    //this.responses.forEach((SurveyResponse userResponse) {
-    //  userResponse.responses.forEach((SurveyQuestion question, SurveyQuestionChoice choice) {
-    //    this.data[index].firstWhere((c) => c.choice == choice.text).freq += 1;
-    //  });
-    //});
-
+    this.data = createDataSeriesFromResponses(this.responses);
     super.initState();
   }
 
@@ -90,7 +78,7 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
 }
 
 class SimpleBarChart extends StatelessWidget {
-  final List<DataPoint> data;
+  final DataSeries data;
   final String id;
   SimpleBarChart({this.data, this.id});
 
@@ -103,18 +91,12 @@ class SimpleBarChart extends StatelessWidget {
       child: Charts.BarChart([
         Charts.Series<DataPoint,String>(
           id: this.id,
-          data: this.data,
+          data: this.data.series,
 
-          domainFn: (DataPoint d, int i) => d.choice,
+          domainFn: (DataPoint d, int i) => d.text,
           measureFn: (DataPoint d, int i) => d.freq,
         ) 
       ])
     );
   }
-}
-
-class DataPoint {
-  final String choice;
-  int freq;
-  DataPoint({this.choice, this.freq});
 }

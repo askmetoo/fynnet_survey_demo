@@ -76,9 +76,24 @@ bool addResponse(SurveyResponse response) {
 }
 
 // Responses are assumed to be from the same survey.
+// TODO: improve algorithm -- currently it's at an atrocious O(n*m) time
 List<DataSeries> createDataSeriesFromResponses(List<SurveyResponse> responses, {String surveyId}) {
   Survey survey = getSurvey(id: surveyId ?? responses[0].surveyId);
-  //List<String> questionText = survey.questions.map((q) => q.text);
-  return null;
+  
+  List<SurveyQuestion> questions = survey.questions;
+  return responses
+    .map((r) => r.responses)
+    .fold(
+      [ for (SurveyQuestion q in questions) 
+        DataSeries([ for (SurveyQuestionChoice c in q.choices) DataPoint(c.text, 0)]) 
+      ],
+
+      (acc, e) {
+        for (int i = 0; i < questions.length; i++) {
+          acc[i].getDataPointByText(e[questions[i]].text).increment();
+        }
+        return acc;
+      } 
+    );
 }
 

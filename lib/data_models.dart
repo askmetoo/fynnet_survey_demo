@@ -139,4 +139,8 @@ class DataSeries {
   void addDataPoint(DataPoint dataPoint) {
     this.series.add(dataPoint);
   }
+
+  DataPoint getDataPointByText(String text) {
+    return this.series.firstWhere((DataPoint d) => d.text == text);
+  }
 }
