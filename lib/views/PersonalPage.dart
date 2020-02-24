@@ -100,7 +100,7 @@ class PersonalTab {
 Widget _createSurveyListTile(BuildContext context, Survey survey) {
   void _previewAction() => {};
   void _editAction() => Navigator.of(context).pushNamed('/edit', arguments: {'surveyId': survey.id});
-  void _publishAction() => {};
+  void _publishAction() => survey.publish();
   void _resultsAction() => Navigator.of(context).pushNamed('/results', arguments: {'surveyId': survey.id});
   void _deleteAction() => {};
 

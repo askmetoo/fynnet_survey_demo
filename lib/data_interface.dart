@@ -48,7 +48,8 @@ bool addSurvey(Survey survey) {
 
 SurveyResponse getResponse({String surveyId, String userId}) {
   if (surveyId == null || userId == null) {
-    throw 'Both the surveyId and userId must be provided in getResponse';
+    print('Both the surveyId and userId must be provided in getResponse');
+    return null;
   } else {
     return SampleDatabase.responses.firstWhere(
       (SurveyResponse response) => response.matchSurvey(surveyId) && response.matchUser(userId),
@@ -67,11 +68,13 @@ Iterable<SurveyResponse> getResponsesByUser(String userId) {
 
 // adds the provided SurveyResponse to the database. returns false if SurveyResponse already exists
 bool addResponse(SurveyResponse response) {
-  if (getResponse(surveyId: response.surveyId, userId: response.userId) == null) {
+  SurveyResponse existing = getResponse(surveyId: response.surveyId, userId: response.userId);
+  if (existing == null) {
     SampleDatabase.responses.add(response);
     return true;
   } else {
-    return false;
+    existing = response;
+    return true;
   }
 }
 

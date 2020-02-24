@@ -1,4 +1,5 @@
 /* Defines the schemas of data that will be stored in a database */
+import 'package:flutter/widgets.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
 
 // For password hashing
@@ -19,11 +20,12 @@ class Survey {
   bool published;
   List<SurveyQuestion> questions;
   
+  void publish() => this.published = true;
 
-  Survey({this.title, this.author, this.questions}) {
+  Survey({this.title, @required this.author, this.published, this.questions}) {
     this.id = uuid.v4();
-    this.author = this.author ?? 'Author'; // TODO: get value from logged in user
-    this.published = false;
+    this.author = this.author;
+    this.published = this.published ?? false;
 
     this.questions = this.questions ?? <SurveyQuestion>[];
   }
@@ -58,7 +60,7 @@ class SurveyQuestionChoice {
   String questionId;
   String text;
 
-  SurveyQuestionChoice({this.text = '', this.questionId}) {
+  SurveyQuestionChoice({this.text = '', @required this.questionId}) {
     this.id = uuid.v4();
   }
 }
@@ -78,7 +80,7 @@ class User {
 
   List<Survey> createdSurveys;
 
-  User({this.username, String password}) {
+  User({@required this.username, String password}) {
     this.id = uuid.v4();
     this.hash = generateHash(password, this.id);
 
@@ -100,15 +102,9 @@ class SurveyResponse {
 
   Map<SurveyQuestion, SurveyQuestionChoice> responses;
 
-  SurveyResponse({this.userId, this.surveyId, this.responses}) {
-    Survey survey = getSurvey(id: surveyId);
-    //this.responses = { for (SurveyQuestion q in survey.questions) q.id : null };
+  SurveyResponse({@required this.userId, @required this.surveyId, this.responses}) {
     this.responses = this.responses ?? Map<SurveyQuestion, SurveyQuestionChoice>();
   }
-
-  //void addResponse(String questionId, String choiceId) {
-  //  this.responses[questionId] = choiceId;
-  //}
 
   bool matchUser(String userId) {
     return this.userId == userId;

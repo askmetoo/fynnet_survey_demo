@@ -14,7 +14,7 @@ class SurveyRespond extends StatefulWidget {
 
 class _SurveyRespondState extends State<SurveyRespond> {
   Survey _survey;
-  SurveyQuestion _currentQuestion; // current question
+  SurveyQuestion _currentQuestion;
   SurveyResponse _response;
 
   _handleSubmit() async {
@@ -23,16 +23,22 @@ class _SurveyRespondState extends State<SurveyRespond> {
       await showDialog(context: context,
         builder: (context) => AlertDialog(title: Text('Submission successful'),
           content: Text('Your responses have been successfully recorded!'),
-          actions: [
-            RaisedButton(
-              child: Text('Okay'), 
-              onPressed: () => Navigator.of(context).pop()
-            )
-          ]
+          actions: [RaisedButton(
+            child: Text('Okay'), 
+            onPressed: () => Navigator.of(context).pop()
+          )]
         )
       ).then((_) => Navigator.of(context).pop());
     } else {
-      throw 'Response unable to be added to database. Most likely the user has already answered the survey';
+      await showDialog(context: context,
+        builder: (context) => AlertDialog(title: Text('Submission failed'),
+          content: Text('Response unable to be added to database.'),
+          actions: [RaisedButton(
+            child: Text('Okay'), 
+            onPressed: () => Navigator.of(context).pop()
+          )]
+        )
+      );
     }
   }
 
@@ -46,17 +52,18 @@ class _SurveyRespondState extends State<SurveyRespond> {
 
   @override
   void didChangeDependencies() {
-    this._response = SurveyResponse(
+    this._response = getResponse(
+      surveyId: widget.surveyId,
+      userId: UserInfo.of(context).user?.id 
+    ) ?? SurveyResponse(
       surveyId: widget.surveyId, 
-      userId: UserInfo.of(context).user.id
+      userId: UserInfo.of(context).user?.id ?? 'guest-${uuid.v4()}'
     );
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    
-
     MaterialButton _formControlButton(String text, {Color color, Color textColor, @required Function onPressed}) {
       return RaisedButton(
         child: Text(text),
@@ -88,37 +95,41 @@ class _SurveyRespondState extends State<SurveyRespond> {
 
     MaterialButton _submitButton = _formControlButton('Submit',
       // enables button only if all questions have been responded
-      onPressed: this._response.responses.values.any((e) => e == null) ? null : () {
+      onPressed: this._response.responses.length < this._survey.questions.length ? null : () {
         _handleSubmit();
       }
     );
 
     Future<bool> _exitConfirmation() async {
-      return await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => AlertDialog(
-          title: Text('Are you sure?'),
-          content: Text('Exiting this survey without submitting will discard all your changes!'),
-          actions: [
-            FlatButton(
-              child: Text('Return to survey'),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
-            FlatButton(
-              color: Theme.of(context).errorColor,
-              child: Text('Discard changes',
-                style: TextStyle(color: Theme.of(context).dialogBackgroundColor)
+      if (this._response.responses.length == 0) {
+        return true;
+      } else {
+        return await showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) => AlertDialog(
+            title: Text('Are you sure?'),
+            content: Text('Exiting this survey without submitting will discard all your changes!'),
+            actions: [
+              FlatButton(
+                child: Text('Return to survey'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
               ),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              }
-            )
-          ]
-        )
-      ) ?? false; // to deal with back button forcing dialog to return null
+              FlatButton(
+                color: Theme.of(context).errorColor,
+                child: Text('Discard changes',
+                  style: TextStyle(color: Theme.of(context).dialogBackgroundColor)
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                }
+              )
+            ]
+          )
+        ) ?? false; // to deal with back button forcing dialog to return null
+      }
     }
     
     return WillPopScope(

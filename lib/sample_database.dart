@@ -16,7 +16,8 @@ import 'package:fynnet_survey_demo/data_models.dart';
   final List<Survey> surveys = [
     Survey(
       title: 'Sample survey #1',
-      author: users[0].id, 
+      author: users[0].id,
+      published: true,
       questions: [
         SurveyQuestion(SurveyQuestionType.radio,
           id: 'sample_s1q1',
@@ -54,6 +55,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
     Survey(
       title: 'Sample Survey #2',
       author: users[1].id, 
+      published: true,
       questions: [
         SurveyQuestion(SurveyQuestionType.radio,
         id: 'sample_s2q1',
@@ -91,6 +93,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
     Survey(
       title: 'Sample Survey #3',
       author: users[0].id, 
+      published: true,
       questions: [
         SurveyQuestion(SurveyQuestionType.radio,
           id: 'sample_s3q1',

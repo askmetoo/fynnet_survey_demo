@@ -22,7 +22,8 @@ class _MainPageState extends State<MainPage> {
   User user;
 
   void _createNewSurvey() {
-    Survey newSurvey = Survey(author: this.user.id);
+    print('creating new survey...');
+    Survey newSurvey = Survey(author: this.user?.id ?? UserInfo.of(context).user.id);
     addSurvey(newSurvey);
     Navigator.of(context).pushNamed('/edit', arguments: {'surveyId' : newSurvey.id});
   }
@@ -37,7 +38,7 @@ class _MainPageState extends State<MainPage> {
   // Creates a ListTile of provided survey object to be fed into a ListView
   ListTile _surveyListing(BuildContext context, Survey survey, [bool answered = false]) {
     return ListTile(
-      title: Text(survey.title,
+      title: Text(survey.title ?? 'Untitled survey',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -74,7 +75,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    this.surveys = getSurveys();
+    this.surveys = getSurveys().where((Survey s) => s.published).toList();
     this.user = UserInfo.of(context).user;
 
     MaterialButton _accountButton = FlatButton(
@@ -86,7 +87,7 @@ class _MainPageState extends State<MainPage> {
       child: Row(
         children: [
           Icon(Icons.person),
-          this.user == null ? Text('Log In') : Text('${this.user.username}\'s Account')
+          this.user == null ? Text('Log In') : Text('${this.user.username}')
         ]
       ),
       onPressed: () => this.user == null ? 

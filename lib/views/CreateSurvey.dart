@@ -133,7 +133,7 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
         barrierDismissible: true,
         builder: (context) => AlertDialog(
           title: Text('Are you sure?'),
-          content: Text('You are deleting this question: \"${question.text}\"'),
+          content: Text('You are deleting the question: \"${question.text}\"'),
           actions: [
             FlatButton(
               child: Text('Cancel'),
@@ -164,30 +164,34 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
       key: widget.key,
       child: ExpansionTile(
         key: PageStorageKey<String>(widget.question.id),
-        //leading: Icon(Icons.reorder),
+        leading: Icon(Icons.reorder),
         title: widget.question.text == '' ?
-          Text('<New question>', style: TextStyle(
-            fontWeight: FontWeight.w500, 
-            fontStyle: FontStyle.italic, 
-            color: Theme.of(context).disabledColor,
-          )) :
-          Text(widget.question.text, style: TextStyle(fontWeight: FontWeight.w700)),
+          Text('<New question>', 
+            style: TextStyle(
+              fontWeight: FontWeight.w500, 
+              fontStyle: FontStyle.italic, 
+              color: Theme.of(context).disabledColor,
+            )
+          ) :
+          Text(widget.question.text, 
+            style: TextStyle(fontWeight: FontWeight.w700)
+          ),
         trailing: PopupMenuButton(
-                  icon: Icon(Icons.more_vert),
-                  onSelected: (String value){
-                    switch(value) {
-                      case 'delete':
-                      _confirmDelete(widget.question);
-                      // left open for more options
-                    }
-                  },
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text('Delete', style: TextStyle(color: Theme.of(context).errorColor))
-                    ),
-                  ]
-                ),
+          icon: Icon(Icons.more_vert),
+          onSelected: (String value){
+            switch(value) {
+              case 'delete':
+              _confirmDelete(widget.question);
+              // left open for more options in the future
+            }
+          },
+          itemBuilder: (BuildContext context) => [
+            PopupMenuItem(
+              value: 'delete',
+              child: Text('Delete', style: TextStyle(color: Theme.of(context).errorColor))
+            ),
+          ]
+        ),
         children: [
           Padding(
             padding: EdgeInsets.all(24),
@@ -241,7 +245,6 @@ class _EditSurveyQuestionChoiceState extends State<EditSurveyQuestionChoice> {
   // Checks if the new choice should be added or deleted from the list of choices.
   void _onFocusChange(SurveyQuestion question, SurveyQuestionChoice choice, String newText) {
     // parent required to redraw all choices
-    print('focus changed on widget id ${choice.id}');
     // TODO: less spaghettified method? pass in callback instead? inherited widget?
     widget.parent.setState(() {
       if ((choice.text ?? '').isEmpty && newText.isNotEmpty) {
