@@ -4,16 +4,15 @@ import 'package:fynnet_survey_demo/data_models.dart';
 import 'package:fynnet_survey_demo/user_state.dart';
 
 class PersonalPage extends StatefulWidget {
-  PersonalPage({Key key, this.title}) : super(key: key);
-  final String title;
+  PersonalPage({Key key}) : super(key: key);
 
   @override
   _PersonalPageState createState() => _PersonalPageState();
 }
 
 class _PersonalPageState extends State<PersonalPage> {
-  List<Widget> _createSurveysList() {
-    Iterable<Survey> surveys = getSurveysFromUser(userId: UserInfo.of(context).user.id);
+  List<Widget> _createSurveysList(userId) {
+    Iterable<Survey> surveys = getSurveysFromUser(userId: userId);
     return surveys.length == 0 ? 
       [
         Padding(padding: EdgeInsets.all(36),
@@ -28,8 +27,8 @@ class _PersonalPageState extends State<PersonalPage> {
       ] :
       surveys.map((Survey survey) => _createSurveyListTile(context, survey)).toList();
   } 
-  List<Widget> _createResponsesList() {
-    Iterable<SurveyResponse> responses = getResponsesByUser(UserInfo.of(context).user.id);
+  List<Widget> _createResponsesList(userId) {
+    Iterable<SurveyResponse> responses = getResponsesByUser(userId);
     return responses.length == 0 ? 
       [
         Padding(padding: EdgeInsets.all(36),
@@ -47,6 +46,9 @@ class _PersonalPageState extends State<PersonalPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    User user = UserInfo.of(context).user;
+
     // Defining tabs in page
     List<PersonalTab> _tabs = [
       PersonalTab(
@@ -54,7 +56,7 @@ class _PersonalPageState extends State<PersonalPage> {
         icon: Icons.comment,
         content: Card(
           child: ListView(
-            children: _createSurveysList()
+            children: _createSurveysList(user.id)
           )
         ),
       ),
@@ -63,7 +65,7 @@ class _PersonalPageState extends State<PersonalPage> {
         icon: Icons.check_box,
         content: Card(
           child: ListView(
-            children: _createResponsesList()
+            children: _createResponsesList(user.id)
           )
         ),
       )
@@ -74,7 +76,7 @@ class _PersonalPageState extends State<PersonalPage> {
 
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text('${user.username}\'s Personal Page'),
           bottom: TabBar(
             tabs: _tabs.map( (PersonalTab tab) => Tab(text: tab.title, icon: Icon(tab.icon)) ).toList()
           ),

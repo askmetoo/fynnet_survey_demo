@@ -13,11 +13,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case '/':
       return MaterialPageRoute(
-        builder: (_) => MainPage(title: 'Survey App')
+        builder: (_) => MainPage()
       );
     case '/account':
       return MaterialPageRoute(
-        builder: (_) => PersonalPage(title: 'My Account')
+        builder: (_) => PersonalPage()
       );
     case '/respond':
       return MaterialPageRoute(

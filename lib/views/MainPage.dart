@@ -21,6 +21,12 @@ class _MainPageState extends State<MainPage> {
   TextEditingController _searchController;
   User user;
 
+  void _createNewSurvey() {
+    Survey newSurvey = Survey(author: this.user.id);
+    addSurvey(newSurvey);
+    Navigator.of(context).pushNamed('/edit', arguments: {'surveyId' : newSurvey.id});
+  }
+
   Widget _buildSurveyList(List surveys) => Expanded(
     child: ListView.builder(
       itemCount: surveys.length,
@@ -86,14 +92,16 @@ class _MainPageState extends State<MainPage> {
       onPressed: () => this.user == null ? 
         showDialog(
           context: context, 
-          builder: (BuildContext context) => new LoginDialog()
+          builder: (BuildContext context) => LoginDialog(
+            onSuccess: () => Navigator.of(context).pushNamed('/account')
+          )
         ) : 
         Navigator.of(context).pushNamed('/account')
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Survey App'),
         actions: <Widget>[
           Padding(
             padding: EdgeInsets.all(8),
@@ -104,18 +112,11 @@ class _MainPageState extends State<MainPage> {
 
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {
-          if(this.user == null) {
-            showDialog(
-              context: context, 
-              builder: (BuildContext context) => LoginDialog()
-            );
-          } else {
-            Survey newSurvey = Survey(author: this.user.id);
-            addSurvey(newSurvey);
-            Navigator.of(context).pushNamed('/edit', arguments: {'surveyId' : newSurvey.id});
-          } 
-        }
+        onPressed: () => this.user == null ?
+          showDialog(
+            context: context, 
+            builder: (BuildContext context) => LoginDialog(onSuccess: this._createNewSurvey)
+          ) : this._createNewSurvey
       ),
 
       body: Center(

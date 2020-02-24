@@ -4,6 +4,8 @@ import 'package:fynnet_survey_demo/data_models.dart';
 import 'package:fynnet_survey_demo/user_state.dart';
 
 class LoginDialog extends StatefulWidget {
+  final Function onSuccess;
+  LoginDialog({this.onSuccess});
   @override
   State<StatefulWidget> createState() => _LoginDialogState();
 }
@@ -24,7 +26,7 @@ class _LoginDialogState extends State<LoginDialog>{
       setState(() { this._actionError = false; });
       UserInfo.of(context).updateUser(user);
       Navigator.of(context).pop();
-      Navigator.of(context).pushNamed('/account', arguments: {'userId' : user.id});
+      widget.onSuccess();
     } else {
       setState(() { this._actionError = true; });
     }
