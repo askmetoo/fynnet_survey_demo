@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'package:fynnet_survey_demo/data_models.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
+import 'package:fynnet_survey_demo/user_state.dart';
 
 class SurveyRespond extends StatefulWidget {
   // Specific survey being answered is fixed throughout widget lifetime
-  SurveyRespond({Key key, this.surveyId, this.userId}) : super(key: key);
+  SurveyRespond({Key key, this.surveyId}) : super(key: key);
   final String surveyId;
-  final String userId;
-
   @override
   _SurveyRespondState createState() => _SurveyRespondState();
 }
 
 class _SurveyRespondState extends State<SurveyRespond> {
   Survey _survey;
-  int _page; // current question
   SurveyQuestion _currentQuestion; // current question
   SurveyResponse _response;
 
@@ -40,15 +38,25 @@ class _SurveyRespondState extends State<SurveyRespond> {
 
   @override // required to access widget object
   void initState() {
-    this._page = 0;
     this._survey = getSurvey(id: widget.surveyId);
     this._currentQuestion = _survey.questions[0];
-    this._response = SurveyResponse(surveyId: widget.surveyId, userId: widget.userId);
+    
     super.initState();
   }
 
   @override
+  void didChangeDependencies() {
+    this._response = SurveyResponse(
+      surveyId: widget.surveyId, 
+      userId: UserInfo.of(context).user.id
+    );
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    
+
     MaterialButton _formControlButton(String text, {Color color, Color textColor, @required Function onPressed}) {
       return RaisedButton(
         child: Text(text),
@@ -122,7 +130,6 @@ class _SurveyRespondState extends State<SurveyRespond> {
             Card(
               child: QuestionPage(_currentQuestion,
                 currentSelection: this._response.responses[_currentQuestion]?.id ?? '', 
-                //key: ObjectKey(_currentQuestion), // no need for key if stateless
                 onChanged: (String choiceId) => setState(() {
                   this._response.responses[_currentQuestion] = this._currentQuestion.choices.firstWhere((c) => c.id == choiceId);
                 })

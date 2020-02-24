@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'package:fynnet_survey_demo/data_models.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
+import 'package:fynnet_survey_demo/user_state.dart';
 
 import 'package:fynnet_survey_demo/views/Login.dart';
 
 class MainPage extends StatefulWidget {
-  MainPage({Key key, this.title, this.userId}) : super(key: key);
+  MainPage({Key key, this.title}) : super(key: key);
 
   final String title;
-  final String userId;
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -55,41 +55,67 @@ class _MainPageState extends State<MainPage> {
       trailing: Icon(Icons.keyboard_arrow_right),
 
       onTap: () {
-        Navigator.pushNamed(context, '/respond', arguments: {'surveyId': survey.id, 'userId': widget.userId});
+        Navigator.pushNamed(context, '/respond', arguments: {'surveyId': survey.id});
       }
     );
   }
 
   @override
   void initState() {
-    this.surveys = getSurveys();
     this._searchController = TextEditingController();
-    this.user = widget.userId != null ? getUser(id: widget.userId) : null;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    this.surveys = getSurveys();
+    this.user = UserInfo.of(context).user;
+
     MaterialButton _accountButton = FlatButton(
       textColor: Colors.white,
+      color: Colors.green,
+      shape: StadiumBorder(
+        side: BorderSide(color: Colors.white)
+      ),
       child: Row(
         children: [
           Icon(Icons.person),
-          Text('Your Account')
+          this.user == null ? Text('Log In') : Text('${this.user.username}\'s Account')
         ]
       ),
-      onPressed: () => showDialog(
-        context: context, 
-        builder: (BuildContext context) => new LoginDialog()
-      )
+      onPressed: () => this.user == null ? 
+        showDialog(
+          context: context, 
+          builder: (BuildContext context) => new LoginDialog()
+        ) : 
+        Navigator.of(context).pushNamed('/account')
     );
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: <Widget>[
-          _accountButton
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: _accountButton
+          )
         ]
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          if(this.user == null) {
+            showDialog(
+              context: context, 
+              builder: (BuildContext context) => LoginDialog()
+            );
+          } else {
+            Survey newSurvey = Survey(author: this.user.id);
+            addSurvey(newSurvey);
+            Navigator.of(context).pushNamed('/edit', arguments: {'surveyId' : newSurvey.id});
+          } 
+        }
       ),
 
       body: Center(

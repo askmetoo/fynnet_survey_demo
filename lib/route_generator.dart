@@ -8,21 +8,20 @@ import 'package:fynnet_survey_demo/views/SurveyDataPage.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   final Map args = settings.arguments;
-  final String userId = args != null ? args['userId'] : null;
   final String surveyId = args != null ? args['surveyId'] : null;
 
   switch (settings.name) {
     case '/':
       return MaterialPageRoute(
-        builder: (_) => MainPage(title: 'Survey App', userId: userId)
+        builder: (_) => MainPage(title: 'Survey App')
       );
     case '/account':
       return MaterialPageRoute(
-        builder: (_) => PersonalPage(title: 'My Account', userId: userId)
+        builder: (_) => PersonalPage(title: 'My Account')
       );
     case '/respond':
       return MaterialPageRoute(
-        builder: (_) => SurveyRespond(surveyId: surveyId, userId: userId)
+        builder: (_) => SurveyRespond(surveyId: surveyId)
       );
     case '/edit':
       return MaterialPageRoute(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
 import 'package:fynnet_survey_demo/data_models.dart';
+import 'package:fynnet_survey_demo/user_state.dart';
 
 class LoginDialog extends StatefulWidget {
   @override
@@ -21,6 +22,7 @@ class _LoginDialogState extends State<LoginDialog>{
 
     if (user != null) {
       setState(() { this._actionError = false; });
+      UserInfo.of(context).updateUser(user);
       Navigator.of(context).pop();
       Navigator.of(context).pushNamed('/account', arguments: {'userId' : user.id});
     } else {

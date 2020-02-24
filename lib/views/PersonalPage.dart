@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
 import 'package:fynnet_survey_demo/data_models.dart';
+import 'package:fynnet_survey_demo/user_state.dart';
 
 class PersonalPage extends StatefulWidget {
-  PersonalPage({Key key, this.title, this.userId}) : super(key: key);
+  PersonalPage({Key key, this.title}) : super(key: key);
   final String title;
-  final String userId;
 
   @override
   _PersonalPageState createState() => _PersonalPageState();
@@ -13,7 +13,7 @@ class PersonalPage extends StatefulWidget {
 
 class _PersonalPageState extends State<PersonalPage> {
   List<Widget> _createSurveysList() {
-    Iterable<Survey> surveys = getSurveysFromUser(userId: widget.userId);
+    Iterable<Survey> surveys = getSurveysFromUser(userId: UserInfo.of(context).user.id);
     return surveys.length == 0 ? 
       [
         Padding(padding: EdgeInsets.all(36),
@@ -29,7 +29,7 @@ class _PersonalPageState extends State<PersonalPage> {
       surveys.map((Survey survey) => _createSurveyListTile(context, survey)).toList();
   } 
   List<Widget> _createResponsesList() {
-    Iterable<SurveyResponse> responses = getResponsesByUser(widget.userId);
+    Iterable<SurveyResponse> responses = getResponsesByUser(UserInfo.of(context).user.id);
     return responses.length == 0 ? 
       [
         Padding(padding: EdgeInsets.all(36),
