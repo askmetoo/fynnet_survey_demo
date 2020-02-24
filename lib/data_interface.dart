@@ -80,23 +80,23 @@ bool addResponse(SurveyResponse response) {
 
 // Responses are assumed to be from the same survey.
 // TODO: improve algorithm -- currently it's at an atrocious O(n*m) time
+/// Turns the [responses] into a list of DataSeries, each corresponding to a single question.
 List<DataSeries> createDataSeriesFromResponses(List<SurveyResponse> responses, {String surveyId}) {
-  Survey survey = getSurvey(id: surveyId ?? responses[0].surveyId);
-  
+  Survey survey = getSurvey(id: surveyId);
   List<SurveyQuestion> questions = survey.questions;
+  List<DataSeries> emptyData = [ 
+    for (SurveyQuestion q in questions) 
+      DataSeries(series: [ for (SurveyQuestionChoice c in q.choices) DataPoint(c.text, 0)], question: q) 
+  ];
+
   return responses
     .map((r) => r.responses)
-    .fold(
-      [ for (SurveyQuestion q in questions) 
-        DataSeries([ for (SurveyQuestionChoice c in q.choices) DataPoint(c.text, 0)]) 
-      ],
-
-      (acc, e) {
-        for (int i = 0; i < questions.length; i++) {
-          acc[i].getDataPointByText(e[questions[i]].text).increment();
-        }
-        return acc;
-      } 
-    );
+    .fold(emptyData, (acc, e) {
+      for (int i = 0; i < questions.length; i++) {
+        acc[i].getDataPointByText(e[questions[i]].text).increment();
+      }
+      return acc;
+    } 
+  );
 }
 

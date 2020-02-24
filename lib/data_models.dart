@@ -127,12 +127,13 @@ class DataPoint {
 }
 
 class DataSeries {
+  SurveyQuestion question;
   List<DataPoint> series;
 
   int get length => series.length;
   int get total => series.map((d) => d.freq).reduce((a, b) => a + b);
 
-  DataSeries([this.series]) {
+  DataSeries({this.series, this.question}) {
     this.series = this.series ?? <DataPoint>[];
   }
 

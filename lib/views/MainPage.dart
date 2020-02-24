@@ -117,7 +117,7 @@ class _MainPageState extends State<MainPage> {
           showDialog(
             context: context, 
             builder: (BuildContext context) => LoginDialog(onSuccess: this._createNewSurvey)
-          ) : this._createNewSurvey
+          ) : this._createNewSurvey()
       ),
 
       body: Center(

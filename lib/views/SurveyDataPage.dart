@@ -19,9 +19,8 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
   List<DataSeries> data;
 
   // TODO: have SurveyQuestionChoice also contain question id?
-  Widget _buildQuestionResults(int index) {
-    SurveyQuestion question = this.survey.questions[index];
-
+  Widget _buildQuestionResults(DataSeries data) {
+    SurveyQuestion question = data.question;
     return Card(
       child: Padding(
         padding: EdgeInsets.all(12.0),
@@ -29,13 +28,8 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
           children: [
             Text(question.text, style: TextStyle(fontSize: 18)),
             Divider(thickness: 1),
-            SurveyDataTable(data: this.data[index]),
-            //Row(
-            //  children: [
-                //SimpleBarChart(id: question.id, data: this.data[index]),
-                SimplePieChart(id: question.id, data: this.data[index])
-            //  ]
-            //)
+            SurveyDataTable(data: data),
+            SimplePieChart(id: question.id, data: data)
           ]
         ),
       )
@@ -46,7 +40,7 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
   void initState() {
     this.survey = getSurvey(id: widget.surveyId);
     this.responses = getResponsesBySurvey(widget.surveyId).toList();
-    this.data = createDataSeriesFromResponses(this.responses);
+    this.data = createDataSeriesFromResponses(this.responses, surveyId: widget.surveyId);
     super.initState();
   }
 
@@ -57,8 +51,6 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
         title: Text('Survey Results')
       ),
       body: ListView(
-        //mainAxisAlignment: MainAxisAlignment.start,
-        //crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 8.0),
@@ -72,8 +64,14 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
             )
           ),
           Divider(thickness: 2.0, indent: 12, endIndent: 12),
-          //_buildQuestionResults(0)
-          for (int i = 0; i < survey.questions.length; i++) _buildQuestionResults(i)
+          this.data.every((d) => d.series.every((e) => e.freq == 0)) ? 
+            Padding(
+              padding: EdgeInsets.fromLTRB(5, 50, 5, 50),
+              child: Text('No results found', 
+                textAlign: TextAlign.center, 
+                style: TextStyle(fontSize: 24, color: Theme.of(context).disabledColor)
+              )
+            ) : this.data.map((questionResults) => _buildQuestionResults(questionResults))
           
         ]
       ),

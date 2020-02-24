@@ -26,16 +26,31 @@ class _EditSurveyState extends State<EditSurvey> {
     this.survey = getSurvey(id: widget.surveyId);
     _titleFieldController = new TextEditingController(text: this.survey.title);
     _titleFieldController.addListener(() {
-      setState(() {
-        this.survey.title = _titleFieldController.text;
-      });
+      print('title changed to ${_titleFieldController.text}');
+      if (this.survey.title != _titleFieldController.text) {
+        setState(() {
+          this.survey.title = _titleFieldController.text;
+        });
+      }
     });
+
     super.initState();
   }
 
   // FIXME: once focused on textfield outside of ReorderableListView, one cannot unfocus by going to another textfield
   @override
   Widget build(BuildContext context) {
+    void _reorderQuestions(int oldIndex, int newIndex) {
+      setState(() {
+        if (newIndex > oldIndex) newIndex -= 1;
+        final SurveyQuestion item = this.survey.questions.removeAt(oldIndex);
+        this.survey.questions.insert(newIndex, item);
+      });
+    }
+    void _addChoice() {
+      setState(() { this.survey.questions.add(new SurveyQuestion(SurveyQuestionType.radio)); });
+    }
+
     TextFormField _titleField = TextFormField(
       controller: _titleFieldController,
 
@@ -54,9 +69,7 @@ class _EditSurveyState extends State<EditSurvey> {
 
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {
-          setState(() { this.survey.questions.add(new SurveyQuestion(SurveyQuestionType.radio)); });
-        }
+        onPressed: _addChoice
       ),
 
       body: Column(
@@ -64,23 +77,12 @@ class _EditSurveyState extends State<EditSurvey> {
           _titleField,
           if (this.survey.questions != null) Expanded(
             child: ReorderableListView(
-              header: _titleField,
               padding: EdgeInsets.fromLTRB(10, 20, 10, 50),
               children: 
                 this.survey.questions.map((SurveyQuestion question) => 
                   EditSurveyQuestion(question, this, key: ValueKey(question.id)) // Key needed for reordering
                 )?.toList(),
-              onReorder: (int oldIndex, int newIndex) {
-                setState( () {
-                  if (newIndex > oldIndex) {
-                    newIndex -= 1;
-                  }
-                  final SurveyQuestion item = this.survey.questions.removeAt(oldIndex);
-                  this.survey.questions.insert(newIndex, item);
-                },
-              );
-          
-              }
+              onReorder: _reorderQuestions
             )
           )
         ]
@@ -102,8 +104,8 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
   TextEditingController _questionTitleController;
   SurveyQuestionChoice _newChoice;
 
-  // Creates a new Choice object for new choices to be written to. 
-  // This will be added to the existing list of Choices in this Question
+  /// Creates a new Choice object for new choices to be written to. 
+  /// This will be added to the existing list of Choices in this Question
   void _createNewChoice() {
     this._newChoice = new SurveyQuestionChoice(questionId: widget.question.id);
   }
@@ -199,7 +201,7 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                
+                // Field for question text
                 TextFormField(
                   key: PageStorageKey<String>(widget.question.id + '_field'),
                   style: TextStyle(
@@ -226,7 +228,6 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
       )
     );
   }
-  
 }
 
 class EditSurveyQuestionChoice extends StatefulWidget {
@@ -239,47 +240,53 @@ class EditSurveyQuestionChoice extends StatefulWidget {
 }
 
 class _EditSurveyQuestionChoiceState extends State<EditSurveyQuestionChoice> {
-  FocusNode _focusNode;
   TextEditingController _choiceController;
 
-  // Checks if the new choice should be added or deleted from the list of choices.
-  void _onFocusChange(SurveyQuestion question, SurveyQuestionChoice choice, String newText) {
-    // parent required to redraw all choices
-    // TODO: less spaghettified method? pass in callback instead? inherited widget?
-    widget.parent.setState(() {
-      if ((choice.text ?? '').isEmpty && newText.isNotEmpty) {
-        // add choice to list
-        print('Adding $newText to choices...');
-        choice.text = newText;
-        question.choices.add(choice);
-        // add new blank textfield
-        widget.parent._createNewChoice();
-      } else if (choice.text.isNotEmpty && newText.isEmpty) {
-        // remove choice from list
-        print('Removing ${choice.text} from choices...');
-        question.choices.remove(choice);
-      } else if (choice.text.isNotEmpty && newText.isNotEmpty && choice.text != newText) {
-        // update choice with new text
-        print('Updating ${choice.text} to $newText...');
-        choice.text = newText;
-      }
+  /// Checks if the new choice should be added or deleted from the list of choices.
+  /// 
+  // parent required to redraw all choices, awkward data propagation
+  // TODO: less spaghettified method? pass in callback instead? inherited widget?
+  void _onChange(SurveyQuestion question, SurveyQuestionChoice choice, String newText) {
+    void _addChoice() => widget.parent.setState(() {
+      choice.text = newText;
+      question.choices.add(choice);
+      widget.parent._createNewChoice();
     });
 
+    void _removeChoice() => widget.parent.setState(() {
+      question.choices.remove(choice);
+    });
+
+    void _updateChoice() => widget.parent.setState(() {
+      choice.text = newText;
+    });
+    
+    if ((choice.text ?? '').isEmpty && newText.isNotEmpty) {
+      print('Adding $newText to choices...');
+      _addChoice();
+    } else if (choice.text.isNotEmpty && newText.isEmpty) {
+      print('Removing ${choice.text} from choices...');
+      _removeChoice();
+    } else if (choice.text.isNotEmpty && newText.isNotEmpty && choice.text != newText) {
+      print('Updating ${choice.text} to $newText...');
+      _updateChoice();
+    } else {
+      print('Doing nothing...');
+    }
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    _choiceController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    print('initializing choice: id ${widget.choice.id}, text \'${widget.choice.text}\'');
-    _focusNode = FocusNode();
+    print('building choice: id ${widget.choice.id}, text \'${widget.choice.text}\'');
     _choiceController = TextEditingController(text: widget.choice.text);
-    _focusNode.addListener(() {
-      _onFocusChange(widget.parent.widget.question, widget.choice, _choiceController.text);
+    _choiceController.addListener(() {
+      _onChange(widget.parent.widget.question, widget.choice, _choiceController.text);
     });
     super.initState();
   }
@@ -287,13 +294,10 @@ class _EditSurveyQuestionChoiceState extends State<EditSurveyQuestionChoice> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      key: widget.key,
       child: ListTile(
         leading: Icon(Icons.radio_button_unchecked),
         title: TextFormField(
           controller: _choiceController,
-          focusNode: _focusNode,
-          onEditingComplete: _focusNode.unfocus,
           textInputAction: TextInputAction.next,
           decoration: InputDecoration(
             border: UnderlineInputBorder()
