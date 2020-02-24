@@ -63,9 +63,7 @@ class _PersonalPageState extends State<PersonalPage> {
         icon: Icons.check_box,
         content: Card(
           child: ListView(
-            children: getResponsesByUser(widget.userId).map((SurveyResponse response) =>
-              _createResponseListTile(context, response)
-            ).toList()
+            children: _createResponsesList()
           )
         ),
       )
@@ -98,13 +96,17 @@ class PersonalTab {
 
 // Creates a ListTile of the provided survey information, with different interactions depending on published status
 Widget _createSurveyListTile(BuildContext context, Survey survey) {
-  Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, () {});
-  Widget _editButton = _buttonWithLabel('Edit', Icons.create, () {});
-  Widget _publishButton = _buttonWithLabel('Publish', Icons.publish, () {});
-  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () => Navigator.of(context).pushNamed('/results', arguments: survey.id));
-  Widget _deleteButton = _buttonWithLabel('Delete', Icons.cancel, () {}, color: Colors.red[700]);
+  void _previewAction() => {};
+  void _editAction() => Navigator.of(context).pushNamed('/edit', arguments: {'surveyId': survey.id});
+  void _publishAction() => {};
+  void _resultsAction() => Navigator.of(context).pushNamed('/results', arguments: {'surveyId': survey.id});
+  void _deleteAction() => {};
 
-
+  Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, _previewAction);
+  Widget _editButton = _buttonWithLabel('Edit', Icons.create, _editAction);
+  Widget _publishButton = _buttonWithLabel('Publish', Icons.publish, _publishAction);
+  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, _resultsAction);
+  Widget _deleteButton = _buttonWithLabel('Delete', Icons.cancel, _deleteAction, color: Colors.red[700]);
 
   return ExpansionTile(
     title : Text(survey.title, 
@@ -131,9 +133,13 @@ Widget _createSurveyListTile(BuildContext context, Survey survey) {
 
 // Creates a ListTile of the provided survey information, with different interactions depending on published status
 Widget _createResponseListTile(BuildContext context, SurveyResponse response) {
-  Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, () {});
-  Widget _editButton = _buttonWithLabel('Edit', Icons.edit, () {});
-  Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, () => Navigator.of(context).pushNamed('/results', arguments: response.surveyId));
+  void _reviewAction() => Navigator.of(context).pushNamed('/review', arguments: {'surveyId': response.surveyId}); // TODO: implement review page
+  void _editAction() => Navigator.of(context).pushNamed('/respond', arguments: {'surveyId': response.surveyId});
+  void _resultsAction() => Navigator.of(context).pushNamed('/results', arguments: {'surveyId': response.surveyId});
+
+  Widget _reviewButton = _buttonWithLabel('Review Answers', Icons.remove_red_eye, _reviewAction);
+  Widget _editButton = _buttonWithLabel('Modify Answers', Icons.edit, _editAction);
+  Widget _resultsButton = _buttonWithLabel('See Results', Icons.table_chart, _resultsAction);
 
   Survey survey = getSurvey(id: response.surveyId);
   User author = getUser(id: survey.author);
@@ -152,7 +158,7 @@ Widget _createResponseListTile(BuildContext context, SurveyResponse response) {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _previewButton,
+          _reviewButton,
           _editButton,
           _resultsButton
         ]

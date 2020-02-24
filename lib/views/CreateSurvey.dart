@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:fynnet_survey_demo/data_interface.dart';
 import 'package:fynnet_survey_demo/data_models.dart';
 
 class EditSurvey extends StatefulWidget {
-  EditSurvey({Key key, this.survey}) : super(key: key);
-  final Survey survey;
+  EditSurvey({Key key, this.surveyId}) : super(key: key);
+  final String surveyId;
 
   @override
   _EditSurveyState createState() => _EditSurveyState();
 }
 
 class _EditSurveyState extends State<EditSurvey> {
+  Survey survey;
   TextEditingController _titleFieldController;
 
   @override 
@@ -22,10 +23,11 @@ class _EditSurveyState extends State<EditSurvey> {
 
   @override
   void initState() {
-    _titleFieldController = new TextEditingController(text: widget.survey.title);
+    this.survey = getSurvey(id: widget.surveyId);
+    _titleFieldController = new TextEditingController(text: this.survey.title);
     _titleFieldController.addListener(() {
       setState(() {
-        widget.survey.title = _titleFieldController.text;
+        this.survey.title = _titleFieldController.text;
       });
     });
     super.initState();
@@ -53,19 +55,19 @@ class _EditSurveyState extends State<EditSurvey> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          setState(() { widget.survey.questions.add(new SurveyQuestion(SurveyQuestionType.radio)); });
+          setState(() { this.survey.questions.add(new SurveyQuestion(SurveyQuestionType.radio)); });
         }
       ),
 
       body: Column(
         children: [
           _titleField,
-          if (widget.survey.questions != null) Expanded(
+          if (this.survey.questions != null) Expanded(
             child: ReorderableListView(
               header: _titleField,
               padding: EdgeInsets.fromLTRB(10, 20, 10, 50),
               children: 
-                widget.survey.questions.map((SurveyQuestion question) => 
+                this.survey.questions.map((SurveyQuestion question) => 
                   EditSurveyQuestion(question, this, key: ValueKey(question.id)) // Key needed for reordering
                 )?.toList(),
               onReorder: (int oldIndex, int newIndex) {
@@ -73,8 +75,8 @@ class _EditSurveyState extends State<EditSurvey> {
                   if (newIndex > oldIndex) {
                     newIndex -= 1;
                   }
-                  final SurveyQuestion item = widget.survey.questions.removeAt(oldIndex);
-                  widget.survey.questions.insert(newIndex, item);
+                  final SurveyQuestion item = this.survey.questions.removeAt(oldIndex);
+                  this.survey.questions.insert(newIndex, item);
                 },
               );
           
@@ -146,7 +148,7 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
               ),
               onPressed: () {
                 widget.parent.setState(() {
-                  widget.parent.widget.survey.questions.remove(question);
+                  widget.parent.survey.questions.remove(question);
                 });
                 Navigator.of(context).pop();
               }

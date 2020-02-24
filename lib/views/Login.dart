@@ -22,7 +22,7 @@ class _LoginDialogState extends State<LoginDialog>{
     if (user != null) {
       setState(() { this._actionError = false; });
       Navigator.of(context).pop();
-      Navigator.of(context).pushNamed('/account', arguments: user.id);
+      Navigator.of(context).pushNamed('/account', arguments: {'userId' : user.id});
     } else {
       setState(() { this._actionError = true; });
     }

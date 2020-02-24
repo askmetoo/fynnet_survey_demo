@@ -6,34 +6,31 @@ import 'package:fynnet_survey_demo/views/Respond.dart';
 import 'package:fynnet_survey_demo/views/CreateSurvey.dart';
 import 'package:fynnet_survey_demo/views/SurveyDataPage.dart';
 
-import 'package:fynnet_survey_demo/sample_database.dart' as SampleDatabase;
-
 Route<dynamic> generateRoute(RouteSettings settings) {
-  final args = settings.arguments;
+  final Map args = settings.arguments;
+  final String userId = args != null ? args['userId'] : null;
+  final String surveyId = args != null ? args['surveyId'] : null;
 
   switch (settings.name) {
     case '/':
       return MaterialPageRoute(
-        builder: (_) => MainPage(title: 'Survey App')
+        builder: (_) => MainPage(title: 'Survey App', userId: userId)
       );
     case '/account':
-      assert(args is String);
       return MaterialPageRoute(
-        builder: (_) => PersonalPage(title: 'My Account', userId: args)
+        builder: (_) => PersonalPage(title: 'My Account', userId: userId)
       );
     case '/respond':
-      assert(args is String);
       return MaterialPageRoute(
-        builder: (_) => SurveyRespond(surveyId: args)
+        builder: (_) => SurveyRespond(surveyId: surveyId, userId: userId)
       );
-    case '/create':
+    case '/edit':
       return MaterialPageRoute(
-        builder: (_) => EditSurvey(survey: SampleDatabase.surveys[0])
+        builder: (_) => EditSurvey(surveyId: surveyId)
       );
     case '/results':
-      assert(args is String);
       return MaterialPageRoute(
-        builder: (_) => SurveyDataPage(surveyId: args)
+        builder: (_) => SurveyDataPage(surveyId: surveyId)
       );
     default:
       return errorRoute;
