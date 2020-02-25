@@ -64,16 +64,38 @@ class _SurveyRespondState extends State<SurveyRespond> {
 
   @override
   Widget build(BuildContext context) {
-    MaterialButton _formControlButton(String text, {Color color, Color textColor, @required Function onPressed}) {
-      return RaisedButton(
-        child: Text(text),
-        color: color ?? Theme.of(context).primaryColor,
-        textColor: textColor ?? Theme.of(context).secondaryHeaderColor,
-        onPressed: onPressed,
+    Widget _formControlButton(String text, {IconData iconData, bool down = true, Function disable, @required Function onPressed}) {
+      const top = FractionalOffset(0, 0);
+      const midtop = FractionalOffset(0, 0.3);
+      const midbot = FractionalOffset(0, 0.7);
+      const bot = FractionalOffset(0, 1);
+      
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height * 0.1,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              disable() ? Colors.grey[200] : Theme.of(context).primaryColorLight, 
+              Theme.of(context).scaffoldBackgroundColor
+            ],
+            begin: down ? midbot : midtop,
+            end: down ? top : bot
+          )
+        ),
+        child: FlatButton(
+          child: Icon(iconData, size: 64),
+          textColor: Theme.of(context).primaryColorDark,
+          disabledTextColor: Colors.grey[300],
+          onPressed: onPressed,
+        )
       );
     }
 
-    MaterialButton _backButton = _formControlButton('Go Back', 
+    Widget _backButton = _formControlButton('Go Back', 
+      iconData: Icons.keyboard_arrow_up,
+      down: false,
+      disable: () => _currentQuestion == _survey.questions[0],
       // disables button if user is on the first page
       onPressed: _currentQuestion == _survey.questions[0] ? null : () {
         setState(() { 
@@ -83,7 +105,9 @@ class _SurveyRespondState extends State<SurveyRespond> {
       }
     );
 
-    MaterialButton _nextButton = _formControlButton('Continue',
+    Widget _nextButton = _formControlButton('Continue',
+      iconData: Icons.keyboard_arrow_down,
+      disable: () => this._response.responses[_currentQuestion] == null,
       // disables button if no choice has been made for the current question
       onPressed: this._response.responses[_currentQuestion] == null ? null : () {
         setState(() { 
@@ -93,7 +117,9 @@ class _SurveyRespondState extends State<SurveyRespond> {
       }
     );
 
-    MaterialButton _submitButton = _formControlButton('Submit',
+    Widget _submitButton = _formControlButton('Submit',
+      iconData: Icons.check,
+      disable: () => this._response.responses.length < this._survey.questions.length,
       // enables button only if all questions have been responded
       onPressed: this._response.responses.length < this._survey.questions.length ? null : () {
         _handleSubmit();
@@ -137,7 +163,10 @@ class _SurveyRespondState extends State<SurveyRespond> {
       child: Scaffold(
         appBar: AppBar(),
         body: Center(child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            _backButton,
             Card(
               child: QuestionPage(_currentQuestion,
                 currentSelection: this._response.responses[_currentQuestion]?.id ?? '', 
@@ -146,14 +175,7 @@ class _SurveyRespondState extends State<SurveyRespond> {
                 })
               ) 
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // TODO: properly style buttons or implement better navigational scheme
-                _backButton,
-                _currentQuestion != this._survey.questions.last ? _nextButton : _submitButton,
-              ]
-            )
+            _currentQuestion != this._survey.questions.last ? _nextButton : _submitButton,
           ]
         )
       ))
