@@ -119,6 +119,7 @@ class _LoginDialogState extends State<LoginDialog>{
               setState(() {
                 _usernameController.text = '';
                 _passwordController.text = '';
+                _actionError = false;
                 _signupAction = !_signupAction;
               });
             }

@@ -23,7 +23,9 @@ class _MainPageState extends State<MainPage> {
 
   void _createNewSurvey() {
     print('creating new survey...');
-    Survey newSurvey = Survey(author: this.user?.id ?? UserInfo.of(context).user.id);
+    String userId = this.user?.id ?? UserInfo.of(context).user?.id;
+    assert(userId != null);
+    Survey newSurvey = Survey(author: userId);
     addSurvey(newSurvey);
     Navigator.of(context).pushNamed('/edit', arguments: {'surveyId' : newSurvey.id});
   }
@@ -31,12 +33,16 @@ class _MainPageState extends State<MainPage> {
   Widget _buildSurveyList(List surveys) => Expanded(
     child: ListView.builder(
       itemCount: surveys.length,
-      itemBuilder: (BuildContext context, int index) => _surveyListing(context, surveys[index]),
+      itemBuilder: (BuildContext context, int index) => _surveyListing(context, 
+        surveys[index], 
+        userId: this.user?.id ?? UserInfo.of(context).user?.id
+      ),
     )
   );
 
   // Creates a ListTile of provided survey object to be fed into a ListView
-  ListTile _surveyListing(BuildContext context, Survey survey, [bool answered = false]) {
+  ListTile _surveyListing(BuildContext context, Survey survey, {String userId}) {
+    bool answered = userId == null ? false : survey.hasAnswered(userId);
     return ListTile(
       title: Text(survey.title ?? 'Untitled survey',
         maxLines: 1,
@@ -89,16 +95,20 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     this.user = UserInfo.of(context).user;
+    if (_searchController.text == '') {
+      this.surveys = getSurveys().where((Survey s) => s.published).toList();
+    }
 
     MaterialButton _accountButton = FlatButton(
       textColor: Colors.white,
-      color: Colors.green,
+      color: Theme.of(context).primaryColor,
       shape: StadiumBorder(
         side: BorderSide(color: Colors.white)
       ),
       child: Row(
         children: [
           Icon(Icons.person),
+          Padding(padding: EdgeInsets.all(2)),
           this.user == null ? Text('Log In') : Text('${this.user.username}')
         ]
       ),
@@ -135,6 +145,8 @@ class _MainPageState extends State<MainPage> {
       body: Center(
         child: Column(
           children: [
+
+            // Search field for surveys
             TextFormField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -144,6 +156,7 @@ class _MainPageState extends State<MainPage> {
               )
             ),
 
+            // Render each survey in a list
             surveys.length == 0 ? Padding(
               padding: EdgeInsets.all(24),
               child: Text('No surveys found',

@@ -367,7 +367,6 @@ class _EditSurveyQuestionChoiceState extends State<EditSurveyQuestionChoice> {
         leading: Icon(Icons.radio_button_unchecked),
         title: TextFormField(
           controller: _choiceController,
-          textInputAction: TextInputAction.next,
           decoration: InputDecoration(
             border: UnderlineInputBorder()
           )

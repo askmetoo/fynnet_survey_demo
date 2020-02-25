@@ -21,9 +21,10 @@ class Survey {
   List<SurveyQuestion> questions;
   
   bool get isValid => this.title != '' && this.questions.length > 0 && this.questions.every((q) => q.isValid);
-  void publish() => this.published = true;
 
+  void publish() => this.published = true;
   void delete() => removeSurvey(this);
+  bool hasAnswered(String userId) => getResponse(surveyId: this.id, userId: userId) != null;
 
   Survey({this.title, @required this.author, this.published, this.questions}) {
     this.id = uuid.v4();

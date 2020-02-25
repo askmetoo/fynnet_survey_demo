@@ -12,8 +12,8 @@ class PersonalPage extends StatefulWidget {
 
 class _PersonalPageState extends State<PersonalPage> {
   List<Widget> _createSurveysList(userId) {
-    Iterable<Survey> surveys = getSurveysFromUser(userId: userId);
-    return surveys.length == 0 ? 
+    Iterable<Survey> surveys = getSurveysFromUser(userId: userId ?? '');
+    return surveys.length == 0 || userId == null ? 
       [
         Padding(padding: EdgeInsets.all(36),
           child: Text('No surveys found', 
@@ -28,8 +28,8 @@ class _PersonalPageState extends State<PersonalPage> {
       surveys.map((Survey survey) => _createSurveyListTile(context, survey)).toList();
   } 
   List<Widget> _createResponsesList(userId) {
-    Iterable<SurveyResponse> responses = getResponsesByUser(userId);
-    return responses.length == 0 ? 
+    Iterable<SurveyResponse> responses = getResponsesByUser(userId ?? '');
+    return responses.length == 0 || userId == null ? 
       [
         Padding(padding: EdgeInsets.all(36),
           child: Text('No responses found', 
@@ -100,10 +100,10 @@ class _PersonalPageState extends State<PersonalPage> {
     Widget _editButton = _buttonWithLabel('Edit', Icons.create, _editAction);
     Widget _publishButton = _buttonWithLabel('Publish', Icons.publish, _publishAction);
     Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, _resultsAction);
-    Widget _deleteButton = _buttonWithLabel('Delete', Icons.cancel, _deleteAction, color: Colors.red[700]);
+    Widget _deleteButton = _buttonWithLabel('Delete', Icons.delete, _deleteAction, color: Colors.red[700]);
 
     return ExpansionTile(
-      title : Text(survey.title == '' ? '<Untitled Survey>' : survey.title, 
+      title : Text(survey?.title == null || survey.title == '' ? '<Untitled Survey>' : survey.title, 
         style: TextStyle(
           fontWeight: FontWeight.w600,
         )
@@ -181,6 +181,25 @@ class _PersonalPageState extends State<PersonalPage> {
 
     User user = UserInfo.of(context).user;
 
+    MaterialButton _logoutButton = FlatButton(
+      textColor: Colors.white,
+      color: Theme.of(context).primaryColor,
+      shape: StadiumBorder(
+        side: BorderSide(color: Colors.white)
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.exit_to_app),
+          Padding(padding: EdgeInsets.all(2)),
+          Text('Log Out')
+        ]
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+        UserInfo.of(context).updateUser(null);
+      }
+    );
+
     // Defining tabs in page
     List<PersonalTab> _tabs = [
       PersonalTab(
@@ -188,7 +207,7 @@ class _PersonalPageState extends State<PersonalPage> {
         icon: Icons.comment,
         content: Card(
           child: ListView(
-            children: _createSurveysList(user.id)
+            children: _createSurveysList(user?.id)
           )
         ),
       ),
@@ -197,7 +216,7 @@ class _PersonalPageState extends State<PersonalPage> {
         icon: Icons.check_box,
         content: Card(
           child: ListView(
-            children: _createResponsesList(user.id)
+            children: _createResponsesList(user?.id)
           )
         ),
       )
@@ -208,10 +227,16 @@ class _PersonalPageState extends State<PersonalPage> {
 
       child: Scaffold(
         appBar: AppBar(
-          title: Text('${user.username}\'s Personal Page'),
+          title: Text('${user?.username}\'s Personal Page'),
           bottom: TabBar(
             tabs: _tabs.map( (PersonalTab tab) => Tab(text: tab.title, icon: Icon(tab.icon)) ).toList()
           ),
+          actions: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: _logoutButton
+          )
+        ]
         ),
         body: TabBarView(
           children: _tabs.map( (PersonalTab tab) => tab.content ).toList()
