@@ -10,9 +10,7 @@ import 'package:crypto/crypto.dart';
 import 'package:uuid/uuid.dart';
 var uuid = Uuid();
 
-/*
-  Survey
-*/
+/// Represents a survey, including its [title], [author], and a list of [questions]
 class Survey {
   String id;
   String author;
@@ -20,10 +18,16 @@ class Survey {
   bool published;
   List<SurveyQuestion> questions;
   
+  // Returns whether or not the whole survey is ready for publishing
   bool get isValid => this.title != '' && this.questions.length > 0 && this.questions.every((q) => q.isValid);
 
+  /// Marks the survey as published
   void publish() => this.published = true;
+
+  /// Deletes the survey from the database
   void delete() => removeSurvey(this);
+
+  /// Returns whether or not the specified user has already answered this survey
   bool hasAnswered(String userId) => getResponse(surveyId: this.id, userId: userId) != null;
 
   Survey({this.title, @required this.author, this.published, this.questions}) {
@@ -36,9 +40,8 @@ class Survey {
 
 }
 
-/*
-  SurveyQuestion
-*/
+/// Represents a single question within a survey, containing the [text] of the question and the [choices] available
+// TODO: implement other types of questions: checkbox, freeform, etc.
 class SurveyQuestion {
   String id;
   SurveyQuestionType type;
@@ -46,6 +49,7 @@ class SurveyQuestion {
 
   List<SurveyQuestionChoice> choices;
 
+  /// Returns whether or not the question is ready for publishing
   bool get isValid => this.text != '' && this.choices.length > 1 && this.choices.every((c) => c.isValid);
 
   SurveyQuestion(this.type, {this.text = '', this.choices, this.id}) {
@@ -58,14 +62,13 @@ class SurveyQuestion {
   }
 }
 
-/*
-  SurveyQuestionChoice
-*/
+/// Represents each individual option in a radio-type question
 class SurveyQuestionChoice {
   String id;
   String questionId;
   String text;
 
+  /// Returns whether or not the choice is ready to be published
   bool get isValid => this.text != '';
 
   SurveyQuestionChoice({this.text = '', @required this.questionId}) {
@@ -73,26 +76,20 @@ class SurveyQuestionChoice {
   }
 }
 
-// Define survey question types
+/// Define survey question types -- currently only radio is implemented
 enum SurveyQuestionType {
   radio, checkbox, dropdown, freeform
 }
 
-/*
-  User
-*/
+/// Represents a user of the app. Stores the [username] and [passwordHash]
 class User {
   String id;
   String username;
-  Digest hash;
-
-  List<Survey> createdSurveys;
+  Digest passwordHash;
 
   User({@required this.username, String password}) {
     this.id = uuid.v4();
-    this.hash = generateHash(password, this.id);
-
-    this.createdSurveys = <Survey>[];
+    this.passwordHash = generateHash(password, this.id);
   }
 }
 
@@ -101,9 +98,7 @@ Digest generateHash(String password, String salt) {
   return sha256.convert(bytes);
 }
 
-/*
-  SurveyResponse
-*/
+/// Represents a response given by a unique combination of [userId] and [surveyId]
 class SurveyResponse {
   String userId;
   String surveyId;
@@ -114,15 +109,18 @@ class SurveyResponse {
     this.responses = this.responses ?? Map<SurveyQuestion, SurveyQuestionChoice>();
   }
 
+  /// Returns whether or not the response is given by a specific user
   bool matchUser(String userId) {
     return this.userId == userId;
   }
 
+  /// Returns whether or not the response is for a specific survey
   bool matchSurvey(String surveyId) {
     return this.surveyId == surveyId;
   }
 }
 
+/// Represents a single data point. For radio-type questions, this comprises of the [text] of the option and its [freq]
 class DataPoint {
   final String text;
   int freq;
@@ -134,6 +132,7 @@ class DataPoint {
   }
 }
 
+/// Represents a collection of [DataPoint]s that is connected to a single [question]
 class DataSeries {
   SurveyQuestion question;
   List<DataPoint> series;

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
 import 'package:fynnet_survey_demo/data_models.dart';
 
-class EditSurvey extends StatefulWidget {
-  EditSurvey({Key key, this.surveyId}) : super(key: key);
+class EditSurveyPage extends StatefulWidget {
+  EditSurveyPage({Key key, this.surveyId}) : super(key: key);
   final String surveyId;
 
   @override
-  _EditSurveyState createState() => _EditSurveyState();
+  _EditSurveyPageState createState() => _EditSurveyPageState();
 }
 
-class _EditSurveyState extends State<EditSurvey> {
+class _EditSurveyPageState extends State<EditSurveyPage> {
   Survey survey;
   TextEditingController _titleFieldController;
 
@@ -163,7 +162,7 @@ class _EditSurveyState extends State<EditSurvey> {
 class EditSurveyQuestion extends StatefulWidget{
   EditSurveyQuestion(this.question, this.parent, {Key key}) : super(key: key);
   final SurveyQuestion question;
-  final _EditSurveyState parent;
+  final _EditSurveyPageState parent;
 
   @override
   State<StatefulWidget> createState() => _EditSurveyQuestionState();

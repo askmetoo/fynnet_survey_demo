@@ -4,15 +4,15 @@ import 'package:fynnet_survey_demo/data_models.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
 import 'package:fynnet_survey_demo/user_state.dart';
 
-class SurveyRespond extends StatefulWidget {
+class ResponsePage extends StatefulWidget {
   // Specific survey being answered is fixed throughout widget lifetime
-  SurveyRespond({Key key, this.surveyId}) : super(key: key);
+  ResponsePage({Key key, this.surveyId}) : super(key: key);
   final String surveyId;
   @override
-  _SurveyRespondState createState() => _SurveyRespondState();
+  _ResponsePageState createState() => _ResponsePageState();
 }
 
-class _SurveyRespondState extends State<SurveyRespond> {
+class _ResponsePageState extends State<ResponsePage> {
   Survey _survey;
   SurveyQuestion _currentQuestion;
   SurveyResponse _response;

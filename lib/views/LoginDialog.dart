@@ -137,7 +137,7 @@ User _logInUser({String username, String password}) {
   if (user == null) { // username not found
     return null;
   }
-  if (user.hash == generateHash(password, user.id)) {
+  if (user.passwordHash == generateHash(password, user.id)) {
     return user;
   } else {
     return null;

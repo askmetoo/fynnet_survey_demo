@@ -15,13 +15,13 @@ import 'package:fynnet_survey_demo/data_models.dart';
 
   final List<Survey> surveys = [
     Survey(
-      title: 'Sample survey #1',
+      title: 'Sample Survey',
       author: users[0].id,
       published: true,
       questions: [
         SurveyQuestion(SurveyQuestionType.radio,
           id: 'sample_s1q1',
-          text: 'What is the first letter of the alphabet?',
+          text: 'What is the first letter of the NATO phonetic alphabet?',
           choices: [
             SurveyQuestionChoice(questionId: 'sample_s1q1', text: 'Alpha'), 
             SurveyQuestionChoice(questionId: 'sample_s1q1', text: 'Bravo'), 
@@ -31,7 +31,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
         ),
         SurveyQuestion(SurveyQuestionType.radio,
           id: 'sample_s1q2',
-          text: 'What is the second letter of the alphabet?',
+          text: 'What is the second letter of the NATO phonetic alphabet?',
           choices: [
             SurveyQuestionChoice(questionId: 'sample_s1q2', text: 'Alpha'), 
             SurveyQuestionChoice(questionId: 'sample_s1q2', text: 'Bravo'), 
@@ -41,7 +41,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
         ),
         SurveyQuestion(SurveyQuestionType.radio,
           id: 'sample_s1q3',
-          text: 'What is the third letter of the alphabet?',
+          text: 'What is the third letter of the NATO phonetic alphabet?',
           choices: [
             SurveyQuestionChoice(questionId: 'sample_s1q3', text: 'Alpha'), 
             SurveyQuestionChoice(questionId: 'sample_s1q3', text: 'Bravo'), 
@@ -53,7 +53,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
     ), 
 
     Survey(
-      title: 'Sample Survey #2',
+      title: 'The Knights of the Round Table',
       author: users[1].id, 
       published: true,
       questions: [
@@ -91,7 +91,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
     ),
 
     Survey(
-      title: 'Sample Survey #3',
+      title: 'Gender and Sexual Identities Survey',
       author: users[0].id, 
       published: true,
       questions: [

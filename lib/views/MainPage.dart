@@ -4,7 +4,7 @@ import 'package:fynnet_survey_demo/data_models.dart';
 import 'package:fynnet_survey_demo/data_interface.dart';
 import 'package:fynnet_survey_demo/user_state.dart';
 
-import 'package:fynnet_survey_demo/views/Login.dart';
+import 'package:fynnet_survey_demo/views/LoginDialog.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
