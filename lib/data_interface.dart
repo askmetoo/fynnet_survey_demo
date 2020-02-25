@@ -45,6 +45,10 @@ bool addSurvey(Survey survey) {
     return false;
   }
 }
+/// Removes the specified survey from the database. Return true if the survey was found, false if not.
+bool removeSurvey(Survey survey) {
+  return SampleDatabase.surveys.remove(survey);
+}
 
 SurveyResponse getResponse({String surveyId, String userId}) {
   if (surveyId == null || userId == null) {

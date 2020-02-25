@@ -18,7 +18,6 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
   List<SurveyResponse> responses;
   List<DataSeries> data;
 
-  // TODO: have SurveyQuestionChoice also contain question id?
   Widget _buildQuestionResults(DataSeries data) {
     SurveyQuestion question = data.question;
     return Card(
@@ -64,14 +63,21 @@ class _SurveyDataPageState extends State<SurveyDataPage> {
             )
           ),
           Divider(thickness: 2.0, indent: 12, endIndent: 12),
-          this.data.every((d) => d.series.every((e) => e.freq == 0)) ? 
-            Padding(
+          Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Text('Total responses: ${this.responses.length}',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey[700])
+            )
+          ),
+          ...(this.data.every((d) => d.series.every((e) => e.freq == 0)) ? 
+            [Padding(
               padding: EdgeInsets.fromLTRB(5, 50, 5, 50),
               child: Text('No results found', 
                 textAlign: TextAlign.center, 
                 style: TextStyle(fontSize: 24, color: Theme.of(context).disabledColor)
               )
-            ) : this.data.map((questionResults) => _buildQuestionResults(questionResults))
+            )] : this.data.map((questionResults) => _buildQuestionResults(questionResults)))
           
         ]
       ),

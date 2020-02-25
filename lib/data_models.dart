@@ -20,7 +20,10 @@ class Survey {
   bool published;
   List<SurveyQuestion> questions;
   
+  bool get isValid => this.title != '' && this.questions.length > 0 && this.questions.every((q) => q.isValid);
   void publish() => this.published = true;
+
+  void delete() => removeSurvey(this);
 
   Survey({this.title, @required this.author, this.published, this.questions}) {
     this.id = uuid.v4();
@@ -42,6 +45,8 @@ class SurveyQuestion {
 
   List<SurveyQuestionChoice> choices;
 
+  bool get isValid => this.text != '' && this.choices.length > 1 && this.choices.every((c) => c.isValid);
+
   SurveyQuestion(this.type, {this.text = '', this.choices, this.id}) {
     this.id = this.id ?? uuid.v4();
     if (this.type == SurveyQuestionType.freeform && this.choices != null) {
@@ -59,6 +64,8 @@ class SurveyQuestionChoice {
   String id;
   String questionId;
   String text;
+
+  bool get isValid => this.text != '';
 
   SurveyQuestionChoice({this.text = '', @required this.questionId}) {
     this.id = uuid.v4();

@@ -53,7 +53,7 @@ class _LoginDialogState extends State<LoginDialog>{
           padding: EdgeInsets.all(2.0),
           child: Text(
             this._signupAction ? 
-              'A user with the username \"${_usernameController}\" already exists!' :
+              'A user with the username \"${_usernameController.text}\" already exists!' :
               'Your username or password is incorrect. Please re-verify.',
             textAlign: TextAlign.center,
             style: TextStyle(

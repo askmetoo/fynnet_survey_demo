@@ -46,36 +46,80 @@ class _PersonalPageState extends State<PersonalPage> {
 
   // Creates a ListTile of the provided survey information, with different interactions depending on published status
   Widget _createSurveyListTile(BuildContext context, Survey survey) {
-    void _previewAction() => {};
     void _editAction() => Navigator.of(context).pushNamed('/edit', arguments: {'surveyId': survey.id});
-    void _publishAction() => setState(() { survey.publish(); });
+    void _publishAction() => survey.isValid ? 
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text('Are you sure?'),
+      content: Text('You won\'t be able to make any more changes after publishing'),
+      actions: [
+        FlatButton(
+          child: Text('Cancel'),
+          onPressed: () { Navigator.of(context).pop(); }
+        ),
+        FlatButton(
+          child: Text('Confirm'),
+          color: Theme.of(context).primaryColor,
+          textColor: Colors.white,
+          onPressed: () { 
+            setState(() { survey.publish(); });
+            Navigator.of(context).pop();
+          }
+        )
+      ]
+    )) : 
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text('Survey not valid'),
+      content: Text('Survey cannot be published due to pending issues. '
+        'Make sure that there is at least one question, with at least two choices each'),
+      actions: [FlatButton(
+        child: Text('Okay'),
+        onPressed: () { Navigator.of(context).pop(); }
+      )]
+    ));
     void _resultsAction() => Navigator.of(context).pushNamed('/results', arguments: {'surveyId': survey.id});
-    void _deleteAction() => {};
+    void _deleteAction() => showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text('Are you sure?'),
+      content: Text('This will permanently delete the survey'),
+      actions: [
+          FlatButton(
+            child: Text('Cancel'),
+            onPressed: () { Navigator.of(context).pop(); }
+          ),
+          FlatButton(
+            child: Text('Confirm deletion'),
+            color: Theme.of(context).errorColor,
+            textColor: Colors.white,
+            onPressed: () { 
+              setState(() { survey.delete(); });
+              Navigator.of(context).pop();
+            }
+          )
+        ]
+    ));
 
-    Widget _previewButton = _buttonWithLabel('Preview', Icons.remove_red_eye, _previewAction);
     Widget _editButton = _buttonWithLabel('Edit', Icons.create, _editAction);
     Widget _publishButton = _buttonWithLabel('Publish', Icons.publish, _publishAction);
     Widget _resultsButton = _buttonWithLabel('Results', Icons.table_chart, _resultsAction);
     Widget _deleteButton = _buttonWithLabel('Delete', Icons.cancel, _deleteAction, color: Colors.red[700]);
 
     return ExpansionTile(
-      title : Text(survey.title ?? 'Untitled Survey', 
+      title : Text(survey.title == '' ? '<Untitled Survey>' : survey.title, 
         style: TextStyle(
           fontWeight: FontWeight.w600,
         )
       ),
-      subtitle : Text(survey.id), // TODO: change to something more meaningful
+      subtitle : survey.published ?
+        Text('Published', style: TextStyle(color: Colors.green)) :
+        Text('Not published', style: TextStyle(color: Colors.red)),
 
       // Expands on tap to reveal additional options
       children : [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            survey.published ? _previewButton : _editButton,
-            survey.published ? _resultsButton : _publishButton,
-            _deleteButton
-          ]
+          children: survey.published ? 
+            [ _resultsButton, _deleteButton ] : 
+            [ _editButton, _publishButton, _deleteButton ]
         )
       ]
     );
@@ -83,11 +127,9 @@ class _PersonalPageState extends State<PersonalPage> {
 
   // Creates a ListTile of the provided survey information, with different interactions depending on published status
   Widget _createResponseListTile(BuildContext context, SurveyResponse response) {
-    void _reviewAction() => Navigator.of(context).pushNamed('/review', arguments: {'surveyId': response.surveyId}); // TODO: implement review page
     void _editAction() => Navigator.of(context).pushNamed('/respond', arguments: {'surveyId': response.surveyId});
     void _resultsAction() => Navigator.of(context).pushNamed('/results', arguments: {'surveyId': response.surveyId});
 
-    Widget _reviewButton = _buttonWithLabel('Review Answers', Icons.remove_red_eye, _reviewAction);
     Widget _editButton = _buttonWithLabel('Modify Answers', Icons.edit, _editAction);
     Widget _resultsButton = _buttonWithLabel('See Results', Icons.table_chart, _resultsAction);
 
@@ -108,7 +150,6 @@ class _PersonalPageState extends State<PersonalPage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _reviewButton,
             _editButton,
             _resultsButton
           ]

@@ -37,7 +37,6 @@ class _EditSurveyState extends State<EditSurvey> {
     super.initState();
   }
 
-  // FIXME: once focused on textfield outside of ReorderableListView, one cannot unfocus by going to another textfield
   @override
   Widget build(BuildContext context) {
     void _reorderQuestions(int oldIndex, int newIndex) {
@@ -49,6 +48,45 @@ class _EditSurveyState extends State<EditSurvey> {
     }
     void _addChoice() {
       setState(() { this.survey.questions.add(new SurveyQuestion(SurveyQuestionType.radio)); });
+    }
+    void _onPublish() {
+      if (this.survey.isValid) {
+        setState(() { this.survey.publish(); Navigator.of(context).pop(); });
+      } else {
+        showDialog(context: context, child: AlertDialog(
+          title: Text('Survey not valid'),
+          content: Text('Survey needs to have at least one question, with at least two choices each.'),
+          actions: [
+            FlatButton(
+              child: Text('Continue editing'),
+              onPressed: () { Navigator.of(context).pop(); }
+            )
+          ]
+        ));
+      }
+    }
+    void _onDelete() async {
+      await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+        title: Text('Are you sure?'),
+        content: Text('This will delete the entire survey, with no way to bring it back.'),
+        actions: [
+          FlatButton(
+            child: Text('Continue editing'),
+            onPressed: () { Navigator.of(context).pop(false); }
+          ),
+          FlatButton(
+            child: Text('Confirm deletion'),
+            color: Theme.of(context).errorColor,
+            textColor: Colors.white,
+            onPressed: () { 
+              this.survey.delete(); 
+              Navigator.of(context).pop(true);
+            }
+          )
+        ]
+      )).then((bool pop) {
+        if (pop) Navigator.of(context).pop();
+      });
     }
 
     TextFormField _titleField = TextFormField(
@@ -62,6 +100,30 @@ class _EditSurveyState extends State<EditSurvey> {
       )
     );
 
+    MaterialButton _publishButton = RaisedButton(
+      key: UniqueKey(),
+      child: Row(children: [
+        Icon(Icons.publish),
+        Text('Publish')
+      ]),
+      color: Theme.of(context).primaryColorDark,
+      textColor: Colors.white,
+      onPressed: this.survey.title == '' || this.survey.title == null ? null : _onPublish
+    );
+
+    MaterialButton _deleteButton = RaisedButton(
+      key: UniqueKey(),
+      child: Row(children: [
+        Icon(Icons.delete_forever),
+        Text('Delete')
+      ]),
+      color: Theme.of(context).errorColor,
+      textColor: Colors.white,
+      onPressed: _onDelete
+    );
+
+    
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Creating survey')
@@ -72,6 +134,11 @@ class _EditSurveyState extends State<EditSurvey> {
         onPressed: _addChoice
       ),
 
+      persistentFooterButtons: <Widget>[
+        _deleteButton,
+        _publishButton,
+      ],
+
       body: Column(
         children: [
           _titleField,
@@ -79,12 +146,14 @@ class _EditSurveyState extends State<EditSurvey> {
             child: ReorderableListView(
               padding: EdgeInsets.fromLTRB(10, 20, 10, 50),
               children: 
-                this.survey.questions.map((SurveyQuestion question) => 
-                  EditSurveyQuestion(question, this, key: ValueKey(question.id)) // Key needed for reordering
-                )?.toList(),
+                [
+                  ...this.survey.questions.map((SurveyQuestion question) => 
+                    EditSurveyQuestion(question, this, key: ValueKey(question.id)) // Key needed for reordering
+                  )?.toList()
+                ],
               onReorder: _reorderQuestions
             )
-          )
+          ),
         ]
       )
     );
@@ -128,7 +197,7 @@ class _EditSurveyQuestionState extends State<EditSurveyQuestion> {
     super.initState();
   }
 
-  // Opens up a confirmation dialog before deleting the question
+  /// Opens up a confirmation dialog before deleting the question
   void _confirmDelete(SurveyQuestion question) {
       showDialog(
         context: context,
