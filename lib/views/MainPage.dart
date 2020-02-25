@@ -70,12 +70,24 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     this._searchController = TextEditingController();
+    _searchController.addListener(() {
+      if (_searchController.text == '') {
+        setState(() { this.surveys = getSurveys().where((Survey s) => s.published).toList(); });
+      } else {
+        setState(() {
+          this.surveys = getSurveys()
+            .where((Survey s) => s.published && 
+              s.title.toLowerCase().contains(_searchController.text.toLowerCase()))
+            .toList();
+        });
+      }
+    });
+    this.surveys = getSurveys().where((Survey s) => s.published).toList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    this.surveys = getSurveys().where((Survey s) => s.published).toList();
     this.user = UserInfo.of(context).user;
 
     MaterialButton _accountButton = FlatButton(
@@ -130,9 +142,15 @@ class _MainPageState extends State<MainPage> {
                 hintText: 'Search for a survey',
                 suffixIcon: Icon(Icons.search)
               )
-            ), // TODO: add search functionality
+            ),
 
-            _buildSurveyList(surveys),
+            surveys.length == 0 ? Padding(
+              padding: EdgeInsets.all(24),
+              child: Text('No surveys found',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 24, color: Theme.of(context).disabledColor)
+              )
+            ) : _buildSurveyList(surveys),
 
           ]
         )
